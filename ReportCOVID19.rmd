@@ -1,0 +1,341 @@
+---
+title: "Exploratory data analysis : COVID19 package"
+author: "Paul Trincklin, Jiacheng FU, Ruiqi WANG"
+date: "26/12/2021"
+output: html_document
+---
+Dans ce rapport, nous allons utiliser le package COVID19, qui contient un large dataframe de données mondiales de suivi de divers indicateur de la pandémie, comme les cas, décès, politiques gouvernementales, tests, hospitalisations. L'objectif est d'utiliser ces données combiner à la tidyverse et en particulier le module ggplot pour proposer des visualisation intéressantes ainsi que des propositions d'explications sur ces données.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+#Packages utilisés
+library(COVID19)
+library(tidyverse)
+library(gridExtra)
+library(tidyquant)
+library(dplyr)
+library(hchinamap)
+library(gganimate)
+library(av)
+library(maps)
+library(sp)
+library(ggplot2)
+library(RColorBrewer)
+library(knitr)
+data <- covid19()
+```
+
+# Présentation des données
+Voici ci-dessous un extrait des données, concernant la France. On peut y voir de nombreux indicateurs correspondant au nom des colonnes, et on va par la suite en détailler quelques-uns.
+```{r echo=FALSE}
+#Données de quelques pays
+fr <- covid19("France",verbose=FALSE)
+usa <- covid19("USA",verbose=FALSE)
+ch <- covid19("China",verbose=FALSE)
+DT::datatable(fr)
+```
+Voici une carte montrant la proportion de personnes contaminés dans chaque pays. On remarque que les régions les plus touchées sont l'Europe et l'Amérique, alors que l'Asie, l'Afrique et L'océanie sont moins touchées.
+
+```{r echo=FALSE,fig.width=10}
+world_map <- map_data("world")
+
+world_map$region[which(world_map$region =='USA')] <- 'United States'
+
+df1<- data %>% 
+  group_by(administrative_area_level_1) %>% 
+  mutate(rate_confirmed= confirmed/population) %>%  
+  select(rate_confirmed,administrative_area_level_1) %>% 
+  slice(which.max(rate_confirmed))
+
+confirmed_world_map<-
+right_join(world_map, df1, by = c("region" = "administrative_area_level_1"))
+
+ggplot(confirmed_world_map, aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill=rate_confirmed), color = "white") +
+  scale_x_continuous(breaks = seq(-180, 210, 45), labels = function(x){paste0(x, "°")}) +
+  scale_y_continuous(breaks = seq(-60, 100, 30), labels = function(x){paste0(x, "°")}) +
+  scale_fill_gradient(low = "yellow", high="red") +labs(title="Carte de l'épidémie mondiale",y="Latitude", x="Longitude",subtitle = "Taux d'infection (cas confirmés/population)\n") +
+  theme_light() 
+```
+
+# Cas recensées
+Voici les cas rencensés par 3 pays, en fonction du temps:
+
+```{r echo=FALSE,fig.height=10}
+plot.fr <- fr %>%
+  mutate(daily_cases = c(NA, diff(confirmed))) %>%
+  filter(daily_cases>0) %>% 
+  filter(format(date, format="%Y")<2022) %>% 
+  ggplot(aes(x = date, y = daily_cases)) +
+  geom_ma(ma_fun=SMA,n=7,color="green",linetype=1) +
+  labs (y="nombre des cas",title="France") +
+  scale_y_continuous(labels=scales::comma) +
+  labs(title="Cas journaliers recensés en fonction du temps")
+
+
+plot.usa <- usa %>%
+  mutate(daily_cases = c(NA, diff(confirmed))) %>%
+  filter(format(date, format="%Y")<2022) %>% 
+  ggplot(aes(x = date, y = daily_cases)) +
+  geom_ma(ma_fun=SMA,n=7,color="blue",linetype=1) +
+  labs (y="nombre des cas",title="Etats-Unis") +
+  scale_y_continuous(labels=scales::comma)
+
+
+plot.ch <- ch %>%
+  mutate(daily_cases = c(NA, diff(confirmed))) %>%
+  filter(format(date, format="%Y")<2022) %>% 
+  ggplot(aes(x = date, y = daily_cases)) +
+  geom_ma(ma_fun=SMA,n=7,color="red",linetype=1)+
+  labs (y="nombre des cas",title="Chine")+
+  scale_y_continuous(labels=scales::comma)
+
+grid.arrange(plot.fr, plot.usa, plot.ch, nrow=3)
+```
+
+On remarque que les dynamiques sont assez différentes. La Chine, premier pays touché, a subi une vague initiale, mais des mesures très contraignantes ont permis de garder un nombre de cas faible par la suite. D'autres pays, comme la France et les Etats-Unis, ont été touché plus tard. on s'aperçoit que le nombre relevé début 2020 sont très faible, alors que c'est le pic de l'épidémie, ce qui montre une limite du jeu de données: elles correspondent à ce qui est déclaré par les gouvernements, mais ce n'est pas toujours représentatif de la réalité. Ce graphe montre que l'épidémie fonctionne par vagues, liées soit aux conditions climatiques (les pics les plus grands ont lieu l'hiver) soit à l'apparition de nouveaux variants (comme sur les données récentes). Ces données ne sont pas à la même échelle, c'est ce que l'on fait sur le graphe suivant:
+
+```{r echo=FALSE}
+data %>%
+  filter(administrative_area_level_1 %in% c("United States","China","France")) %>% 
+  group_by(administrative_area_level_1) %>% 
+  mutate(daily_cases = c(NA, diff(confirmed))) %>%
+  filter(format(date, format="%Y")<2022) %>% 
+  filter(daily_cases>0) %>% 
+  ggplot(aes(x = date, y = daily_cases,color=administrative_area_level_1)) +
+    geom_ma(ma_fun=SMA,n=7,linetype=1) +
+   scale_y_continuous(labels=scales::comma) +
+  labs(title="Cas journaliers recensés en fonction du temps")
+```
+
+On voit ici la différence entre la Chine et les autres pays. Seules des mesures politiques drastiques peuvent contenir l'épidémie.
+
+On peut regarder sur quelques pays mondiaux la proportion totale des personnes infectées:
+```{r echo=FALSE}
+data %>%
+  group_by(iso_alpha_3) %>% 
+  slice(which.max(confirmed)) %>% 
+  filter(confirmed>4000000) %>% 
+  mutate(cases_prop=confirmed/population) %>% 
+  ggplot(aes(x=reorder(iso_alpha_3,cases_prop),y=100*cases_prop,fill=reorder(administrative_area_level_1,desc(cases_prop))))+
+  geom_col() +
+  coord_flip() +
+  labs(x="Pays",y="Proportion de personnes infectées et testées avec le virus (%)",fill="Pays") 
+  
+```
+
+Ce graphe ne permet pas de tirer de conclusion claire: les pays développés semblent avoir subi l'épidémie de manière plus importante, mais cette différence peut s'attribuer à une meilleure remontée des données et une plus grande capacité de tests. On voit une autre limité des données. Les données les mieux partagées sont celles des Etats-Unis (par exemple, les décès français ne sont pas présent sur la première année), c'est pourquoi on se concentrera sur ce pays.
+
+# Décès liées au COVID19
+
+On superpose, en les remettant à l'échelle, les nombres de cas et les décès liées au virus.
+
+```{r echo=FALSE}
+stats_usa <- usa %>% 
+  mutate(daily_cases = c(NA, diff(confirmed))) %>% 
+  mutate(daily_deaths= c(NA, diff(deaths))) %>% 
+  mutate(daily_tests= c(NA, diff(tests))) %>% 
+  filter(daily_cases>0) %>% 
+  filter(daily_deaths>0)
+stats_usa %>% 
+  ggplot() +
+    geom_ma(aes(x = date, y = 0.01*daily_cases,colour='Cas'),ma_fun=SMA,n=7,linetype=1) +
+    geom_ma(aes(x = date, y = daily_deaths,colour='Décès'),ma_fun=SMA,n=7,linetype=1) +
+  scale_y_continuous(name = "Décès",
+    sec.axis = sec_axis(~.*100, name="Nombre de cas",labels=scales::comma),labels=scales::comma) +
+  labs(title="Cas et décès journaliers recensés en fonction du temps aux Etats-Unis")
+```
+
+On voit que les deux courbes semblent très corrélées: le nombre de décès suit le nombre de cas, avec un léger décalage. On peut faire une interprétation de ce décalage: les malades sont admis à l'hôpital plusieurs jours après s'être fai tester, ce qui induit un décalage. 
+
+On regarde ensuite le taux de mortalité, c'est à dire la proportion de décès par rapport aux cas recensés. 
+
+
+```{r echo=FALSE}
+stats_usa %>% 
+  mutate(death_rate=daily_deaths/daily_cases) %>% 
+  ggplot(aes(x=date,y=death_rate)) +
+  geom_ma(aes(x = date, y = 100*death_rate),ma_fun=SMA,n=7,linetype=1) +
+  labs(y="Taux de mortalité par rapport aux cas enregistrés (%)") +
+  labs(title="Taux de mortalité en fonction du temps aux Etats-Unis")
+```
+
+Celui-ci est élevé au départ, ce qui peut être expliqué par le faible nombre de tests au début de l'épidémie. Le taux de mortalité varie entre 1 et 3%, cette variabilité pourrait s'expliquer par la variabilité du nombre de tests: on teste plus pendant les vagues, les tests deviennent plus précis, tests et décès sont décalés, la virus mute et change... Tous ces facteurs dont qu'il est difficile d'estimer la mortalité du virus. On semble néanmoins remarquer une tendance à la baisse: on peut penser que c'est grâce à l'amélioration des traitements et à la vaccination. En particulier récemment, le taux baisse fortement: le variant omicron et peut-être moins mortel que le virus original.
+
+Voici ensuite, dans différents pays, le pourcentage de personnes décédés du COVID19 par pays. 
+
+```{r echo=FALSE}
+data %>%
+  group_by(iso_alpha_3) %>% 
+  slice(which.max(deaths)) %>% 
+  filter(deaths>50000) %>% 
+  mutate(deaths_prop=deaths/population) %>% 
+  ggplot(aes(x=reorder(iso_alpha_3,deaths_prop),y=100*deaths_prop,fill=reorder(administrative_area_level_1,desc(deaths_prop))))+
+  geom_col() +
+  coord_flip() +
+  labs(x="Pays",y="Proportion de personnes décédées (%)",fill="Pays")
+  
+```
+
+La valeur très élevée au Pérou peut s'expliquer par la forte présence de population indigène disposant d'un faible accès au soin. Le nombre de décès est d'environ 200 pour 100.000 habitants dans les pays européens, et ce taux varie de manière modérée selon les régions.
+
+# Taux de positivité
+
+Voici la variation du taux de positivité aux états-unis:
+
+```{r echo=FALSE}
+stats_usa %>% 
+  mutate(positivity_rate=daily_cases/daily_tests) %>% 
+  ggplot(aes(x=date,y=positivity_rate)) +
+  geom_ma(aes(x = date, y = 100*positivity_rate),ma_fun=SMA,n=7,linetype=1) +
+  labs(y="Taux de positivité par rapport aux cas enregistrés (%)") +
+  labs(title="Taux de positivité en fonction du temps aux Etats-Unis")
+```
+
+On voit ici encore que ce taux suit les différentes vagues du virus, et l'explosion de ce taux récemment, que l'on peut imputé au variant omicron.
+
+# Vaccination
+
+Heuresement, il existe aussi des moyens pour lutter contre l'épidémie. Le plus important est la vaccination: tous les pays du monde ont développé des politiques massives d'incitation, voici ci-dessous la proportion de personnes vaccinées avec 2 doses par pays.
+
+```{r echo=FALSE}
+data %>%
+  group_by(iso_alpha_3) %>% 
+  slice(which.max(people_vaccinated)) %>% 
+  filter(people_vaccinated>53000000) %>% 
+  mutate(vacc_prop=people_vaccinated/population) %>% 
+  ggplot(aes(x=reorder(iso_alpha_3,vacc_prop),y=100*vacc_prop,fill=reorder(administrative_area_level_1,desc(vacc_prop))))+
+  geom_col() +
+  coord_flip() +
+  labs(x="Pays",y="Proportion de personnes vaccinées avec 2 doses (%)",fill="Pays") 
+  
+```
+
+Ce graphe illsutre encore la différence entre pays riches et pays pauvres: ces derniers ont des taux de vaccination plus faibles. 
+
+Pour une vaccination complète, il faut au minimum 2 doses. On trace ci-dessous les personnes totalement vaccinées, en rouge, et partiellement vaccinés, en orange.
+
+```{r echo=FALSE}
+usa %>% ggplot()+
+  geom_area(mapping=aes(x=date,y=people_vaccinated),fill='orange') +
+  geom_area(mapping=aes(x=date,y=people_fully_vaccinated),fill='red') +
+  scale_y_continuous(labels=scales::comma) +
+  labs(title="Nombre de vaccinés en France, par nombre de doses")
+
+```
+
+# Politiques gouvernementales
+
+On représente, en plus du nombre de cas recensés, l'indice de support économique en rouge et l'indice de réponse gouvernementale en noir en France.
+```{r echo=FALSE}
+plot.fr+geom_line(mapping = aes(x=date,y=500*economic_support_index),color='red')+
+geom_line(mapping = aes(x=date,y=500*government_response_index),color='black') +
+  labs(title="Politiques gouvernementales en France")
+```
+
+On regarde en France le nombre de jours de fermetures des écoles, correspondant à la catégorie 3 pour une fermeture totale et 2 pour une fermeture partielle. le nombre de jour de fermeture complète a été de 50 jours pendant la première vague.
+
+```{r echo=FALSE}
+fr %>% 
+  count(school_closing) %>% 
+  filter(school_closing>=0) %>% 
+  ggplot(aes(x=school_closing, y=n, fill=school_closing)) +
+  geom_bar(stat="identity")+
+  labs(x="Politique sur la fermeture des écoles")
+```
+
+Voici la légende pour la répartition en catégories:
+0 - no measures
+1 - recommend closing or all schools open with alterations resulting in significant differences compared to non-Covid-19 operations
+2 - require closing (only some levels or categories, eg just high school, or just public schools)
+3 - require closing all levels
+
+On compare les données de restriction de déplacements internationnaux entre différents pays:
+```{r echo=FALSE}
+data %>% 
+  filter(administrative_area_level_1 %in% c("United States","China","France","United Kingdom","Germany","Italy","Spain","Japan","Australia","Canada","Russia","Brazil","Turkey")) %>% 
+  group_by(administrative_area_level_1) %>% 
+  count(international_movement_restrictions) %>% 
+ggplot(aes(x=administrative_area_level_1, y=n, fill=international_movement_restrictions)) +
+geom_bar(position="stack", stat="identity")+
+coord_flip() +
+  labs(title="Politiques de restriction de déplacements internationnaux")
+```
+
+Quelques pays ont des restrictions importantes sur de longues périodes: Australie, Canada et Japon. D'autres ont été plus souples: Brésil, Turquie, et Royaume-Uni. Voici la légende:
+0 - no restrictions
+1 - screening arrivals
+2 - quarantine arrivals from some or all regions
+3 - ban arrivals from some regions
+4 - ban on all regions or total border closure
+
+# Relation Cas-décès
+On analyse la relation entre le nombre de cas confirmés et le décès.
+```{r echo=FALSE}
+data %>% 
+  select(deaths,confirmed,date) %>% 
+  filter(!is.na(deaths),!is.na(confirmed)) %>% 
+  group_by(date)%>% 
+  ggplot(aes(x=confirmed,y=deaths))+
+  geom_smooth(method='gam',formula=y~s(x,bs="cs"))+
+  labs(x="Cas recensés",y="décès recensés",title="Décès en fonction du nombre de cas dans le monde")
+```
+
+On observe que cette courbe n'est pas linéaire: la dérivée est décroissante. Cela signifie que les cas détectés récemment ont moins de chance de mourrir du virus: les raisons peuvent être la vaccination et l'amélioration des soins. On effectue un test pour vérifier la corrélation entre cas et décès:
+```{r echo=FALSE}
+group<- data %>% 
+  group_by(id)
+rank_country <- summarise(group,max_confirmed=max(confirmed))
+
+tem <- summarise(group,max_confirmed=max(confirmed),population=mean(population),max_deaths=max(deaths))
+cor.test(tem$max_confirmed,tem$max_deaths,method = "pearson")
+```
+ On trouve que p-value est assez petit (<<0.05), il existe une très forte corrélation entre le cas confirmé et le décès.
+
+```{r echo=FALSE}
+lm_rel <- lm(max_deaths~max_confirmed,data = tem)
+summary(lm_rel) 
+```
+le facteur R^2 très proche de 1 implique aussi une bonne régression
+
+```{r echo=FALSE}
+var.test(tem$max_confirmed,tem$max_deaths)
+```
+
+
+
+# Graphe animé
+
+On peut également avec ggplot créer des graphes animés.Voici pour finir, dans 5 pays, l'évolution du nombre de cas recensés:
+
+  
+```{r echo=FALSE,message=FALSE}
+cum_patient_time <- data %>% 
+  mutate(daily_cases = c(NA, diff(confirmed))) %>%
+  filter(date<as.Date("2022-01-01")) %>% 
+  select(administrative_area_level_1,latitude,longitude,date,daily_cases,confirmed)
+
+five_country<-subset(cum_patient_time, administrative_area_level_1 %in% c("India","Brazil","Russia","Spain","Italy"))
+five_country$date<-as.Date(five_country$date)
+
+anim <- ggplot(five_country, 
+            aes(x=reorder(administrative_area_level_1,confirmed),y=confirmed, fill=administrative_area_level_1,frame=date)) +  
+  geom_bar(stat= 'identity', position = 'dodge',show.legend = FALSE) +  
+  geom_text(aes(label=paste0(confirmed)),col="black",hjust=-0.2)+  
+  scale_fill_brewer(palette='Set3')+  
+  theme(legend.position="none",
+        panel.background=element_rect(fill='transparent'),
+        axis.text.y=element_text(angle=0,colour="black",size=12,hjust=1),
+        panel.grid =element_blank(),  #delete grid
+        axis.text = element_blank(),  #similar
+        axis.ticks = element_blank(),  
+  )+
+  coord_flip()+  
+  transition_manual(frames=date) +  #animation
+  labs(title = paste('date:', '{current_frame}'),x = '', y ='Comparaison des cas confirmés dans 5 pays')+  
+  theme(axis.title.x = element_text(size=15))+
+  ease_aes('linear')  
+
+  anim
+```
+
