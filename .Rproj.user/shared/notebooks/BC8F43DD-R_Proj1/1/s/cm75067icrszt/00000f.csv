@@ -1,0 +1,4 @@
+"0","library(readr)"
+"0","thyroid <- read_csv(""C:/Users/roman/Downloads/thyroid.csv"")"
+"2","Error: 'C:/Users/roman/Downloads/thyroid.csv' does not exist.
+"

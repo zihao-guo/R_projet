@@ -1,0 +1,5 @@
+"0","#Données de quelques pays"
+"0","fr <- covid19(""France"",verbose=FALSE)"
+"0","usa <- covid19(""USA"",verbose=FALSE)"
+"0","ch <- covid19(""China"",verbose=FALSE)"
+"0","DT::datatable(fr)"

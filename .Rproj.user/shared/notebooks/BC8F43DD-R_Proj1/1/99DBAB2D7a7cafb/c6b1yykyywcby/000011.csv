@@ -1,0 +1,2 @@
+"0","thyroid_impute <- impute_lm(thyroid_impute, TSH_reading_fill ~ T3_reading_fill + T4_reading_fill)"
+"0","thyroid_impute"

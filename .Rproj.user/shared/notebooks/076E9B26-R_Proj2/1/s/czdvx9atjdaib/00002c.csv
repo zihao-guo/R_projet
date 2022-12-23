@@ -1,0 +1,28 @@
+"0","# Supprimer la colonne vide d'origine et remplissez-la avec les données interpolées."
+"0","Col_na  = c(""T3_reading"", ""T4_reading"", ""TSH_reading"", ""FTI_reading"", ""T4U_rate_reading"", 'thyrox_util_rate_T4U_reading') "
+"0","thyroid_tidy = thyroid_impute[,!names(thyroid_impute) %in% Col_na]"
+"0","skim(thyroid_tidy)"
+"1","── Data Summary ────────────────────────
+"
+"1","                           Values      
+"
+"1","Name                       thyroid_tidy
+"
+"1","Number of rows             3772        
+"
+"1","Number of columns          29          
+"
+"1","_______________________                
+"
+"1","Column type frequency:                 
+"
+"1","  character                2           
+"
+"1","  factor                   1           
+"
+"1","  numeric                  26          
+"
+"1","________________________               
+"
+"1","Group variables            None        
+"

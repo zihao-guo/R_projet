@@ -1,0 +1,5 @@
+"0","library(readr)"
+"0","thyroid <- read_csv('thyroid.csv', 'show_col_types' = FALSE)"
+"2","Warning: [38;5;232mOne or more parsing issues, call `problems()` on your data frame for details, e.g.:
+  dat <- vroom(...)
+  problems(dat)[39m"

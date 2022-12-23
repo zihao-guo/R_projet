@@ -1,0 +1,3 @@
+"0","thyroid_impute <- thyroid_td"
+"0","thyroid_impute <- impute_lm(thyroid_impute, T4_reading_fill + T3_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_thyroxine + queried_why_on_thyroxine + presc_anthyroid_meds + sick + pregnant + thyroid_surgery + radioactive_iodine_therapyI131 + query_hypothyroid + query_hyperthyroid + lithium + goitre + tumor + hypopituitarism + psych_condition)"
+"0","thyroid_impute"

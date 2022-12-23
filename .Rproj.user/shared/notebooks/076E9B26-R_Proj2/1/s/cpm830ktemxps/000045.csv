@@ -1,0 +1,2 @@
+"0","thyroid_td$FTI_reading <- as.numeric(factor(thyroid_td$FTI_reading))"
+"0","gg_miss_var(thyroid_td)"

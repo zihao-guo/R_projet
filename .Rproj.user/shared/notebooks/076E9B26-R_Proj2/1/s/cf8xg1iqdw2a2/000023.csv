@@ -1,0 +1,6 @@
+"0","x <- as.data.frame(abs(is.na(data1)))"
+"0",""
+"0","y <- x[which(apply(x, MARGIN=2, sd)>0)] # > 0: avec valeurs manquantes"
+"0","data_m_cor <- as.data.frame.array(cor(y))"
+"0",""
+"0","data_m_cor"

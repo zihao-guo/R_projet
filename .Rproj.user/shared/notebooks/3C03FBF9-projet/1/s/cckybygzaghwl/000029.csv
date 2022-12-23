@@ -1,0 +1,5 @@
+"0","x <- as.data.frame(abs(is.na(thyroid)))"
+"0",""
+"0","library(stats)"
+"0","y <- x[which(apply(x, MARGIN=2, sd)>0)]"
+"0","as.data.frame.array(cor(y))"
