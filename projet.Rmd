@@ -12,9 +12,18 @@ library(tidyverse)
 ```{r}
 library(readr)
 thyroid <- read_csv('thyroid.csv', 'show_col_types' = FALSE)
-view(thyroid)
-problems(thyroid)
+```
 
+```{r}
+library(VIM)
+aggr(thyroid, prop=FALSE, numbers=TRUE)
+```
+```{r}
+x <- as.data.frame(abs(is.na(thyroid)))
+
+library(stats)
+y <- x[which(apply(x, MARGIN=2, sd)>0)] # >0 有缺失值
+as.data.frame.array(cor(y))
 ```
 
 
@@ -22,13 +31,11 @@ problems(thyroid)
 library(skimr)
 skim(thyroid)
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+DT::datatable(thyroid)
+```
+```{r}
+ggplot(data = thyroid) +
+  geom_bar(mapping = aes(x = ThryroidClass))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

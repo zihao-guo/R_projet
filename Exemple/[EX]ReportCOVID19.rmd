@@ -34,29 +34,7 @@ usa <- covid19("USA",verbose=FALSE)
 ch <- covid19("China",verbose=FALSE)
 DT::datatable(fr)
 ```
-Voici une carte montrant la proportion de personnes contaminés dans chaque pays. On remarque que les régions les plus touchées sont l'Europe et l'Amérique, alors que l'Asie, l'Afrique et L'océanie sont moins touchées.
 
-```{r echo=FALSE,fig.width=10}
-world_map <- map_data("world")
-
-world_map$region[which(world_map$region =='USA')] <- 'United States'
-
-df1<- data %>% 
-  group_by(administrative_area_level_1) %>% 
-  mutate(rate_confirmed= confirmed/population) %>%  
-  select(rate_confirmed,administrative_area_level_1) %>% 
-  slice(which.max(rate_confirmed))
-
-confirmed_world_map<-
-right_join(world_map, df1, by = c("region" = "administrative_area_level_1"))
-
-ggplot(confirmed_world_map, aes(x = long, y = lat, group = group)) +
-  geom_polygon(aes(fill=rate_confirmed), color = "white") +
-  scale_x_continuous(breaks = seq(-180, 210, 45), labels = function(x){paste0(x, "°")}) +
-  scale_y_continuous(breaks = seq(-60, 100, 30), labels = function(x){paste0(x, "°")}) +
-  scale_fill_gradient(low = "yellow", high="red") +labs(title="Carte de l'épidémie mondiale",y="Latitude", x="Longitude",subtitle = "Taux d'infection (cas confirmés/population)\n") +
-  theme_light() 
-```
 
 # Cas recensées
 Voici les cas rencensés par 3 pays, en fonction du temps:
