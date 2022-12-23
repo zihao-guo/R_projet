@@ -1,0 +1,91 @@
+---
+title: "Projet"
+output: html_document
+date: "2022-12-16"
+---
+#导入数据
+```{r}
+library(dplyr)
+library(reshape2)
+library(ggplot2)
+library(mice)
+data1 <- read.csv("../thyroid.csv",encoding = 'UTF-8')
+data1$patient_age[which(data1$patient_age =='28;0')] <- 28
+data1$FTI_measured[which(data1$FTI_measured ==119)] <- 1
+```
+
+#均值填充
+
+```{r}
+impute <- function(x, x.impute){ifelse(is.na(x),x.impute,x)}
+data1$TSH_reading<-impute(data1$TSH_reading, mean(is.na(data1$TSH_reading)) )
+data1$T3_reading<-impute(data1$T3_reading, mean(is.na(data1$T3_reading)) )
+data1$T4_reading<-impute(data1$T4_reading, mean(is.na(data1$T4_reading)) )
+data1$FTI_reading<-impute(data1$FTI_reading,mean(is.na(data1$FTI_reading))) 
+data1$ref_src<-impute(data1$ref_src, mean(is.na(data1$ref_src)) )
+data1<-na.omit(data1) 
+```
+#数据变为数值型
+
+```{r}
+data1$ThryroidClass <- as.numeric(factor(data1$ThryroidClass))
+data1$ref_src <- as.numeric(factor(data1$ref_src))
+```
+#多元回归看相关性
+```{r}
+model <- lm(sick~., data = data1)
+summary(model)
+confint(model)
+```
+#化热力图
+```{r}
+library(broom)
+
+model%>% tidy %>% write.csv(file = "mtcars.lm.tidy.csv")
+model%>% glance %>% write.csv(file = "mtcars.lm.glance.csv")
+```
+
+
+```{r}
+str(data1)
+write.table(data1,"1.csv",row.names=FALSE,col.names=TRUE,sep=",")
+data2<- read.csv("1.csv", header = TRUE, stringsAsFactors = F)
+data2 <- select(data2,-FTI_measured)
+```
+
+
+```{r}
+#热力图
+cormtcars <- round(cor(data2), 3) #round()函数自定义小数点后位数
+data <- as.data.frame(cormtcars) %>% #将矩阵转换成数据框
+  mutate(x=rownames(cormtcars)) %>%  #新建一列x，是11种属性变量
+  melt(id='x') %>%                   #将宽数据转换成长数据，更适合ggplot2绘图
+  rename('y'='variable','Corr'='value')  #将variable列名改成y
+#先确定好绘图时x轴、y轴的因子顺序：
+list <- rownames(cormtcars)
+list <- factor(list,levels = list)
+ggplot(data,aes(factor(x,levels = list),
+                factor(y,levels = list), #定义x，y轴顺序，防止被默认改变
+                fill=Corr))+
+  
+#根据相关性值填充颜色
+geom_tile()+  #色块函数
+scale_fill_gradient2(low = 'Blue',mid = 'white',high ='red',
+                     limits=c(-1,1),breaks=c(-1,-0.5,0,0.5,1))+
+labs(x=NULL,y=NULL)+
+theme_bw(base_size = 15)+
+theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+```
+
+#年龄分段
+```{r}
+data3 <- data2
+data3$patient_age<-cut(data3$patient_age,breaks = c(-Inf, 10, 20, 30, 40 ,50 ,60, 70, 80, 90, Inf),labels = c('1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','91-100'))
+
+data3
+```
+
+
+
+
+
