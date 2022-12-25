@@ -1,0 +1,141 @@
+---
+title: "Based on row"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    social: menu
+    source_code: embed
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(skimr)
+library(readr)
+
+library(ggplot2)
+
+```
+
+```{r}
+# 1.Importation des données
+data1 <- read.csv("A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+```
+Sidebar {.sidebar}
+=======================================================================
+
+```{r}
+# Définir la barre latérale (onglets)
+selectInput("patient_age_Seg", 
+            label = "patient's age" , 
+            choices = unique(data1$patient_age_Seg), selected = "1-10")
+selectInput("patient_gender", 
+            label = "patient's gender" , 
+            choices = unique(data1$patient_gender), selected = "0")
+
+selectInput("variable", 
+            label = "summaries of individual variables" , 
+            choices = colnames(data1))
+```
+
+
+Ⅰ.Recap
+=======================================================================
+### Chart A
+
+```{r}
+ggplot() + geom_bar(data = data1, aes(x = patient_age, fill = ThryroidClass), stat = "count",position = "dodge")+ scale_fill_brewer(palette = 'Accent')
+```
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Chart B.1
+
+```{r}
+data1 %>% 
+  filter(data1$patient_age_Seg == "51-60") %>% #as.character(input$patient_age_Seg))
+  ggplot() + 
+  geom_bar(aes(x = patient_gender, fill = ThryroidClass), stat = "count",position = "dodge")
+```
+
+### Chart B.2
+
+```{r}
+data1 %>% 
+  filter(data1$patient_age_Seg == "51-60") %>% #as.character(input$patient_age_Seg))
+  ggplot() + 
+  geom_bar(aes(x = patient_gender, fill = ThryroidClass), stat = "count",position = "dodge")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ⅱ.Summaries {data-orientation=rows}
+=======================================================================
+
+Row {data-height=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+DT::datatable(data1)
+```
+
+Row {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+data1 %>% 
+  filter(data1$patient_age_Seg == "51-60") %>% #as.character(input$patient_age_Seg))
+  ggplot() + 
+  geom_bar(aes(x = patient_gender, fill = ThryroidClass), stat = "count",position = "dodge")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ⅲ.Comparision {data-orientation=rows}
+=======================================================================
+
+Row {data-width=350}
+-----------------------------------------------------------------------
+### Chart C
+
+```{r}
+data1 %>% 
+  # filter(data1$patient_gender == as.character(input$patient_gender))
+  ggplot() + 
+  geom_bar(data = data1, aes(x = patient_age, fill = ThryroidClass), stat = "count",position = "dodge")+ scale_fill_brewer(palette = 'Accent')
+```

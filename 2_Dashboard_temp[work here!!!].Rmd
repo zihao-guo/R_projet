@@ -20,7 +20,7 @@ library(ggplot2)
 
 ```{r}
 # 1.Importation des données
-data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+data1 <- read.csv("A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
 ```
 Sidebar {.sidebar}
 =======================================================================
@@ -33,10 +33,58 @@ selectInput("patient_age_Seg",
 selectInput("patient_gender", 
             label = "patient's gender" , 
             choices = unique(data1$patient_gender), selected = "0")
+
+selectInput("variable", 
+            label = "summaries of individual variables" , 
+            choices = colnames(data1))
 ```
 
 
-Dashboard
+Ⅰ.Recap
+=======================================================================
+### Chart A
+
+```{r}
+ggplot() + geom_bar(data = data1, aes(x = patient_age, fill = ThryroidClass), stat = "count",position = "dodge")+ scale_fill_brewer(palette = 'Accent')
+```
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Chart B.1
+
+```{r}
+data1 %>% 
+  filter(data1$patient_age_Seg == "51-60") %>% #as.character(input$patient_age_Seg))
+  ggplot() + 
+  geom_bar(aes(x = patient_gender, fill = ThryroidClass), stat = "count",position = "dodge")
+```
+
+### Chart B.2
+
+```{r}
+data1 %>% 
+  filter(data1$patient_age_Seg == "51-60") %>% #as.character(input$patient_age_Seg))
+  ggplot() + 
+  geom_bar(aes(x = patient_gender, fill = ThryroidClass), stat = "count",position = "dodge")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ⅱ.Summaries {data-orientation=rows}
 =======================================================================
 
 Row {data-height=650}
@@ -45,7 +93,7 @@ Row {data-height=650}
 ### Chart A
 
 ```{r}
-ggplot() + geom_bar(data = data1, aes(x = patient_age, fill = ThryroidClass), stat = "count",position = "dodge")+ scale_fill_brewer(palette = 'Accent')
+DT::datatable(data1)
 ```
 
 Row {data-width=350}
@@ -60,6 +108,29 @@ data1 %>%
   geom_bar(aes(x = patient_gender, fill = ThryroidClass), stat = "count",position = "dodge")
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ⅲ.Comparision {data-orientation=rows}
+=======================================================================
+
+Row {data-width=350}
+-----------------------------------------------------------------------
 ### Chart C
 
 ```{r}
@@ -68,4 +139,3 @@ data1 %>%
   ggplot() + 
   geom_bar(data = data1, aes(x = patient_age, fill = ThryroidClass), stat = "count",position = "dodge")+ scale_fill_brewer(palette = 'Accent')
 ```
-
