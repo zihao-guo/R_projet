@@ -11,20 +11,12 @@ library(readr)
 
 library(ggplot2)
 library(patchwork)
+library(plotly)
 ```
 
 # 1.Importation des données
 ```{r}
-data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
-# thyroid <- read_csv("C:/Users/roman/Downloads/thyroid.csv")
-problems(data1)
-
-# Résoudre le problème de jeu des données
-data1$patient_age[which(data1$patient_age =='28;0')] <- 28
-data1$FTI_measured[which(data1$FTI_measured ==119)] <- 1
-
-# Afficher les données
-skim(data1)
+data1 <- read.csv("../../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
 ```
 # Visualisation des données
 
@@ -33,6 +25,44 @@ ggplot() + geom_bar(data = data1, aes(x = patient_age, fill = ThryroidClass), st
 
 ggplot() + geom_bar(data = data1, aes(x = patient_gender, fill = ThryroidClass), stat = "count",position = "dodge")
 ```
+```{r}
+data_gender_sick <- data1 %>% 
+  group_by(patient_gender, sick) %>% 
+  summarise(n = n(), .groups = "drop_last")
+
+df <- t(data_gender_sick)
+colnames(df) <- c("m_nor", "m_sick", "fe_nor", "fe_sick")
+df_v1 <- df[-c(1:2),]
+head(df_v1)
+
+x <- c('male', 'female')
+y <- c(1241, 31)
+y2 <- c(2384,96)
+data <- data.frame(x, y, y2)
+
+# Visualisation
+fig <- data %>% plot_ly()
+fig <- fig %>% add_trace(x = ~x, y = ~y, type = 'bar',
+             textposition = 'auto',
+             name = 'male',
+             marker = list(color = 'rgb(158,202,225)',
+                           line = list(color = 'rgb(8,48,107)', width = 1.5)))
+
+fig <- fig %>% add_trace(x = ~x, y = ~y2, type = 'bar',
+            textposition = 'auto',
+            name = 'female',
+            marker = list(color = 'rgb(58,200,225)',
+                          line = list(color = 'rgb(8,48,107)', width = 1.5)))
+
+fig <- fig %>% layout(title = "Taux de maladie pour les hommes et les femmes",
+         barmode = 'group',
+         xaxis = list(title = ""),
+         yaxis = list(title = ""))
+
+fig
+```
+
+
 
 ```{r}
 set.seed(13)

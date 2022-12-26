@@ -15,7 +15,7 @@ library(skimr)
 library(readr)
 
 library(ggplot2)
-
+library(plotly)
 ```
 
 ```{r}
@@ -54,19 +54,61 @@ Row {.tabset .tabset-fade}
 ### Chart B.1
 
 ```{r}
-data1 %>% 
-  filter(data1$patient_age_Seg == "51-60") %>% #as.character(input$patient_age_Seg))
-  ggplot() + 
-  geom_bar(aes(x = patient_gender, fill = ThryroidClass), stat = "count",position = "dodge")
+x <- c('sick', 'normal')
+y <- c(1241, 31)
+y2 <- c(2384,96)
+data <- data.frame(x, y, y2)
+
+# Visualisation
+fig <- data %>% plot_ly()
+fig <- fig %>% add_trace(x = ~x, y = ~y, type = 'bar',
+             textposition = 'auto',
+             name = 'Male',
+             marker = list(color = 'rgb(158,202,225)',
+                           line = list(color = 'rgb(8,48,107)', width = 1.5)))
+
+fig <- fig %>% add_trace(x = ~x, y = ~y2, type = 'bar',
+            textposition = 'auto',
+            name = 'Female',
+            marker = list(color = 'rgb(58,200,225)',
+                          line = list(color = 'rgb(8,48,107)', width = 1.5)))
+
+fig <- fig %>% layout(title = "Taux de maladie pour les hommes et les femmes",
+         barmode = 'group',
+         xaxis = list(title = ""),
+         yaxis = list(title = ""))
+
+fig
 ```
 
 ### Chart B.2
 
 ```{r}
-data1 %>% 
-  filter(data1$patient_age_Seg == "51-60") %>% #as.character(input$patient_age_Seg))
-  ggplot() + 
-  geom_bar(aes(x = patient_gender, fill = ThryroidClass), stat = "count",position = "dodge")
+x <- c('male', 'female')
+y <- c(31,96)
+y2 <- c(1241, 2384)
+data2 <- data.frame(x, y, y2)
+
+# Visualisation
+fig <- data2 %>% plot_ly()
+fig <- fig %>% add_trace(x = ~x, y = ~y, type = 'bar',
+             textposition = 'auto',
+             name = 'Sick',
+             marker = list(color = 'rgb(158,202,225)',
+                           line = list(color = 'rgb(8,48,107)', width = 1.5)))
+
+fig <- fig %>% add_trace(x = ~x, y = ~y2, type = 'bar',
+            textposition = 'auto',
+            name = 'Normal',
+            marker = list(color = 'rgb(58,200,225)',
+                          line = list(color = 'rgb(8,48,107)', width = 1.5)))
+
+fig <- fig %>% layout(title = "Taux de maladie pour les hommes et les femmes",
+         barmode = 'group',
+         xaxis = list(title = ""),
+         yaxis = list(title = ""))
+
+fig
 ```
 
 
