@@ -1,0 +1,1 @@
+"0","ggplot() + geom_bar(data = data1, aes(x = patient_age, fill = ThryroidClass), stat = ""count"",position = ""dodge"")+ scale_fill_brewer(palette = 'Accent')"

@@ -1,0 +1,1 @@
+"0","data1 <- read.csv(""../../A_Datas/thyroid_tidy.csv"",encoding = 'UTF-8')"
