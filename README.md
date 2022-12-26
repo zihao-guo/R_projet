@@ -39,5 +39,12 @@ Il s'agit d'une mission R de Romane, Clément, Zihao.
   $ git branch -a # Voir les branches
   ```
   
+  ## Contenu de la note
+  1. :racehorse:Supprimer le code
+  2. :construction:Modification du code en cours
+  3. :tada:Édition terminée
+  4. :boom:Changements révolutionnaires
+
+
   
   
