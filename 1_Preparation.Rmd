@@ -17,21 +17,24 @@ library(broom)
 
 library(stats)
 library(readr)
+library(ggcorrplot)
+library(psych)
 ```
 
 # 1.Importation des données
 ```{r}
-data1 <- read.csv("../A_Datas/thyroid.csv",encoding = 'UTF-8')
+data1 <- read.csv("./A_Datas/thyroid.csv",encoding = 'UTF-8')
 # thyroid <- read_csv("C:/Users/roman/Downloads/thyroid.csv")
 problems(data1)
 
 # Résoudre le problème de jeu des données
 data1$patient_age[which(data1$patient_age =='28;0')] <- 28
-data1$FTI_measured[which(data1$FTI_measured ==119)] <- 1
 
 # Afficher les données
 DT::datatable(data1)
 ```
+
+
 
 ```{r}
 # Affichage des catégories de données et des valeurs manquantes
@@ -41,9 +44,29 @@ glimpse(thyroid_raw)
 
 thyroid_td <- thyroid_raw %>% 
   remove_empty(c("rows", "cols")) %>%
-  remove_constant(na.rm = FALSE, quiet = FALSE)
+  remove_constant(na.rm = FALSE, quiet = FALSE) 
+
+thyroid_td$FTI_reading <- as.numeric(thyroid_td$FTI_reading)
+thyroid_td$patient_age <- as.numeric(thyroid_td$patient_age)
+
 thyroid_td
 ```
+
+
+```{r,fig.height=10, fig.width=12}
+thyroid_for_cor <- drop_na(thyroid_td)
+corr <- round(cor(data.matrix(thyroid_for_cor)), 1)
+cor.mat <- cor_pmat(data.matrix(thyroid_for_cor))
+
+ggcorrplot(corr, lab=TRUE, type="lower")
+```
+
+
+```{r, fig.height=10, fig.width = 12}
+ggcorrplot(corr, type="lower", p.mat = cor.mat)
+```
+
+
 
 # 2.Traitement des données
 Missing Values
@@ -57,6 +80,11 @@ data_m_cor
 ```
 
 ```{r}
+thyroid_td %>% 
+  filter(T3_measured != 1 & T3_measured != 0)
+```
+
+```{r}
 skim(thyroid_td) %>% 
   filter(n_missing > 0)
 thyroid_td$FTI_reading <- as.numeric(factor(thyroid_td$FTI_reading))
@@ -65,29 +93,29 @@ gg_miss_var(thyroid_td)
 
 ```{r echo=FALSE,fig.height=10}
 plot.T3 <- thyroid_td %>% 
-  ggplot(mapping = aes(x = patient_age, y = T3_reading)) +
+  ggplot(mapping = aes(x = T4_reading, y = T3_reading)) +
   geom_miss_point() +
   labs(title="T3_reading")
 
 
 plot.T4U <- thyroid_td %>% 
-  ggplot(mapping = aes(x = patient_age, y = thyrox_util_rate_T4U_reading)) +
+  ggplot(mapping = aes(x = T4_reading, y = thyrox_util_rate_T4U_reading)) +
   geom_miss_point() +
   labs(title="thyrox_util_rate_T4U_reading")
 
-
-plot.FTI <- thyroid_td %>% 
-  ggplot(mapping = aes(x = patient_age, y = FTI_reading)) +
-  geom_miss_point() +
-  labs(title="FTI_reading")
-
 plot.TSH <- thyroid_td %>% 
-  ggplot(mapping = aes(x = patient_age, y = TSH_reading)) +
+  ggplot(mapping = aes(x = T4_reading, y = TSH_reading)) +
   geom_miss_point() +
   labs(title="TSH_reading")
 
-grid.arrange(plot.T3, plot.T4U, plot.FTI, plot.TSH, nrow=4)
+plot.FTI <- thyroid_td %>% 
+  ggplot(mapping = aes(x = T4_reading, y = FTI_reading)) +
+  geom_miss_point() +
+  labs(title="FTI_reading")
+
+grid.arrange(plot.T3, plot.T4U, plot.TSH, plot.FTI, nrow=4)
 ```
+
 
 
 ## Première variable : T3_reading
@@ -114,6 +142,7 @@ thyroid_td$T3_measured[15]
 ```
 ```{r}
 #Code très laid
+thyroid_td[15, 28] <- "SVHC"
 thyroid_td[15, 21] <- thyroid_td$T3_measured[15]
 thyroid_td[15, 20] <- 1
 thyroid_td[15, 19] <- thyroid_td$TSH_measured[15]
@@ -199,20 +228,27 @@ head(thyroid_td)
 Commençons avec des modèles simples
 
 
-Le problème majeur est donc de modéliser les taux de T3 et T4. C'est un peu plus compliqué. On va essayer de modéliser en prenant en compte toutes les variables où il ne manque pas de valeurs (patient_age excepté). Ce sont toutes des variables catégorielles. L'idée est que des patients aux caractéristiques similaires doivent avoir des taux similaires.
+On va essayer de modéliser linéairement les variables entre elles, à partir de la matrice des corrélations. Commençons par T3.
 
 ```{r}
-thyroid_td$patient_age <- as.numeric(factor(thyroid_td$patient_age))
 thyroid_impute <- thyroid_td
-thyroid_impute <- impute_lm(thyroid_impute, T4_reading_fill + T3_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_thyroxine + queried_why_on_thyroxine + presc_anthyroid_meds + sick + pregnant + thyroid_surgery + radioactive_iodine_therapyI131 + query_hypothyroid + query_hyperthyroid + lithium + goitre + tumor + hypopituitarism + psych_condition)
+thyroid_impute <- impute_lm(thyroid_impute, T3_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_anthyroid_meds + sick + pregnant + query_hypothyroid + query_hyperthyroid + tumor)
 head(thyroid_impute)
 ```
+
+##T4_reading
+```{r}
+thyroid_impute <- impute_lm(thyroid_impute, T4_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_thyroxine + pregnant +  query_hyperthyroid + TSH_measured + T3_measured + T3_reading_fill + thyrox_util_rate_T4U_measured + FTI_measured)
+head(thyroid_impute)
+```
+
+
 
 ## FTI_reading.
 A FTI_reading. D'après internet, FTI = T4/thyroid binding capacity. Il ne me semble pas exister de variable donnant le TGB ici (thyroid binding capacity). Tentons un modèle linéaire en fonction du taux de T4
 
 ```{r}
-thyroid_impute <- impute_lm(thyroid_impute, FTI_reading_fill ~ T4_reading_fill)
+thyroid_impute <- impute_lm(thyroid_impute, FTI_reading_fill ~ patient_gender + presc_thyroxine + psych_condition + T4_reading_fill)
 head(thyroid_impute)
 ```
 
@@ -223,7 +259,7 @@ On a des résultats, sauf dans les lignes où T4 est NA.
 De même, le taux de TSH est lié à ceux de T3 et T4. Un taux de TSH élevé est lié à un taux de T3 ou T4 faible et inversement.
 
 ```{r}
-thyroid_impute <- impute_lm(thyroid_impute, TSH_reading_fill ~ T3_reading_fill + T4_reading_fill)
+thyroid_impute <- impute_lm(thyroid_impute, TSH_reading_fill ~ patient_age + T3_reading_fill + T4_reading_fill + FTI_reading_fill)
 head(thyroid_impute)
 ```
 
@@ -231,14 +267,14 @@ head(thyroid_impute)
 D'après internet, on peut dire que T4U varie avec l'âge, la grossesse, T4 et T3
 
 ```{r}
-thyroid_impute <- impute_lm(thyroid_impute, T4U_rate_reading_fill ~ T3_reading_fill + T4_reading_fill + patient_age + pregnant)
+thyroid_impute <- impute_lm(thyroid_impute, T4U_rate_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_thyroxine + presc_anthyroid_meds + pregnant + query_hyperthyroid + tumor + TSH_reading_fill + FTI_reading_fill + T3_reading_fill + T4_reading_fill)
 head(thyroid_impute)
 
 skim(thyroid_impute)
 ```
 
 ## patient_age
-Les variables fill sont complétées. Il ne reste que l'âge manquant des deux patients.
+Les variables fill sont complétées. Il ne reste que l'âge manquant du patient.
 
 ```{r}
 thyroid_impute %>% 
@@ -247,7 +283,7 @@ thyroid_impute %>%
 Seul l'âge manque dans ces lignes
 
 ```{r}
-thyroid_impute <- impute_lm(thyroid_impute, patient_age ~ ThryroidClass + presc_thyroxine + presc_anthyroid_meds + sick + thyroid_surgery + radioactive_iodine_therapyI131 + lithium + goitre + tumor + hypopituitarism + psych_condition + TSH_reading + T3_reading + T4_reading + thyrox_util_rate_T4U_reading + FTI_reading)
+thyroid_impute <- impute_lm(thyroid_impute, patient_age ~ ThryroidClass + presc_anthyroid_meds + sick + radioactive_iodine_therapyI131 + goitre + tumor +  psych_condition + TSH_reading + T3_reading + T4_reading + thyrox_util_rate_T4U_reading + FTI_reading)
 head(thyroid_impute)
 ```
 ```{r}
@@ -257,6 +293,82 @@ head(thyroid_impute)
 ```{r}
 skim(thyroid_impute)
 ```
+#Visualisation des données
+```{r}
+thyroid_impute %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = T3_reading_fill,
+             colour = T3_reading_NA)) + 
+  geom_point()
+```
+```{r}
+thyroid_impute %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = TSH_reading_fill,
+             colour = TSH_reading_NA)) + 
+  geom_point()
+```
+```{r}
+thyroid_impute %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = FTI_reading_fill,
+             colour = FTI_reading_NA)) + 
+  geom_point()
+```
+```{r}
+thyroid_impute %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = patient_age,
+             colour = patient_age_NA)) + 
+  geom_point()
+```
+```{r}
+thyroid_impute %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = T4U_rate_reading_fill,
+             colour = thyrox_util_rate_T4U_reading_NA)) + 
+  geom_point()
+```
+
+
+# Autre méthode MICE
+
+```{r}
+thyroid_MICE <- thyroid_td
+thyroid_MICE
+```
+
+
+```{r}
+thyroid_MICE$ThryroidClass <- 1*(thyroid_MICE$ThryroidClass == "negative")
+thyroid_MICE$ref_src <- unclass(factor(thyroid_MICE$ref_src))
+thyroid_MICE
+```
+
+
+```{r}
+miceObj <- miceRanger::miceRanger(thyroid_MICE, verbose=FALSE)
+```
+
+```{r}
+thyroid_MICE <- impute(thyroid_MICE, miceObj, verbose = FALSE)
+```
+
+
+
+
+
+
 # 4.La régression multiple examine la corrélation.
 
 ```{r}
@@ -275,7 +387,7 @@ thyroid_tidy = thyroid_impute[,!names(thyroid_impute) %in% Col_na]
 skim(thyroid_tidy)
 
 # Sauvegarder les données nettoyées
-thyroid_tidy %>% write.csv(file = "../A_Datas/thyroid_tidy.csv")
+thyroid_tidy %>% write.csv(file = "./A_Datas/thyroid_tidy.csv")
 ```
 
 ```{r}
