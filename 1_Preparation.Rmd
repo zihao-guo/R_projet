@@ -87,7 +87,7 @@ thyroid_td %>%
 ```{r}
 skim(thyroid_td) %>% 
   filter(n_missing > 0)
-thyroid_td$FTI_reading <- as.numeric(factor(thyroid_td$FTI_reading))
+
 gg_miss_var(thyroid_td)
 ```
 
@@ -354,15 +354,138 @@ thyroid_MICE$ThryroidClass <- 1*(thyroid_MICE$ThryroidClass == "negative")
 thyroid_MICE$ref_src <- unclass(factor(thyroid_MICE$ref_src))
 thyroid_MICE
 ```
-
-
 ```{r}
-miceObj <- miceRanger::miceRanger(thyroid_MICE, verbose=FALSE)
+library(mice)
+init = mice::mice(thyroid_MICE, maxit=0) 
+meth = init$method
+predM = init$predictorMatrix
+```
+```{r}
+set.seed(103)
+imputed = mice(thyroid_MICE, method=meth, predictorMatrix=predM, m=10)
+```
+```{r}
+imputed <- complete(imputed)
+sapply(imputed, function(x) sum(is.na(x)))
+```
+```{r}
+imputed %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading,
+             y = T3_reading,
+             colour = T3_reading_fill_NA)) + 
+  geom_point()
+```
+```{r}
+imputed %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading,
+             y = FTI_reading,
+             colour = FTI_reading_fill_NA)) + 
+  geom_point()
+```
+```{r}
+imputed %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading,
+             y = TSH_reading,
+             colour = TSH_reading_fill_NA)) + 
+  geom_point()
+```
+```{r}
+imputed %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading,
+             y = thyrox_util_rate_T4U_reading,
+             colour = T4U_rate_reading_fill_NA)) + 
+  geom_point()
 ```
 
 ```{r}
-thyroid_MICE <- impute(thyroid_MICE, miceObj, verbose = FALSE)
+thyroid_MICE2 <- thyroid_td
+thyroid_MICE2$ThryroidClass <- 1*(thyroid_MICE2$ThryroidClass == "negative")
+thyroid_MICE2$ref_src <- unclass(factor(thyroid_MICE2$ref_src))
+thyroid_MICE2
 ```
+
+```{r}
+v <- list(
+  patient_age = c("ThryroidClass","patient_gender","presc_thyroxine", "queried_why_on_thyroxine", "presc_anthyroid_meds", "sick", "pregnant", "thyroid_surgery", "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", "T4_measured", "thyrox_util_rate_T4U_measured", "FTI_measured", "ref_src", "T3_reading_fill", "T4_reading_fill", "TSH_reading_fill", "FTI_reading_fill", "T4U_rate_reading_fill")
+  , T3_reading_fill = c("ThryroidClass","patient_age", "patient_gender","presc_thyroxine", "queried_why_on_thyroxine", "presc_anthyroid_meds", "sick", "pregnant", "thyroid_surgery", "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", "T4_measured", "thyrox_util_rate_T4U_measured", "FTI_measured", "ref_src", "T4_reading_fill", "TSH_reading_fill", "FTI_reading_fill", "T4U_rate_reading_fill")
+  , T4_reading_fill = c("ThryroidClass","patient_age", "patient_gender","presc_thyroxine", "queried_why_on_thyroxine", "presc_anthyroid_meds", "sick", "pregnant", "thyroid_surgery", "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", "T4_measured", "thyrox_util_rate_T4U_measured", "FTI_measured", "ref_src", "T3_reading_fill", "TSH_reading_fill", "FTI_reading_fill", "T4U_rate_reading_fill")
+  , TSH_reading_fill = c("ThryroidClass","patient_age", "patient_gender","presc_thyroxine", "queried_why_on_thyroxine", "presc_anthyroid_meds", "sick", "pregnant", "thyroid_surgery", "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", "T4_measured", "thyrox_util_rate_T4U_measured", "FTI_measured", "ref_src", "T4_reading_fill", "T3_reading_fill", "FTI_reading_fill", "T4U_rate_reading_fill")
+  , FTI_reading_fill = c("ThryroidClass","patient_age", "patient_gender","presc_thyroxine", "queried_why_on_thyroxine", "presc_anthyroid_meds", "sick", "pregnant", "thyroid_surgery", "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", "T4_measured", "thyrox_util_rate_T4U_measured", "FTI_measured", "ref_src", "T4_reading_fill", "TSH_reading_fill", "T3_reading_fill", "T4U_rate_reading_fill")
+  , T4U_rate_reading_fill = c("ThryroidClass","patient_age", "patient_gender","presc_thyroxine", "queried_why_on_thyroxine", "presc_anthyroid_meds", "sick", "pregnant", "thyroid_surgery", "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", "T4_measured", "thyrox_util_rate_T4U_measured", "FTI_measured", "ref_src", "T4_reading_fill", "TSH_reading_fill", "FTI_reading_fill", "T3_reading_fill")
+)
+
+
+miceObj <- miceRanger::miceRanger(
+  thyroid_MICE2,
+  m = 5,
+  vars = v, 
+  valueSelector = c("meanMatch"),
+  returnModels = FALSE,
+  parallel = FALSE,
+  verbose = FALSE)
+```
+
+```{r}
+plotDistributions(miceObj,vars='allNumeric')
+```
+
+
+
+
+```{r}
+imputed2 <- completeData(miceObj)[[1]]
+sapply(imputed2, function(x) sum(is.na(x)))
+```
+
+
+```{r}
+imputed2 %>%
+  bind_shadow() %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = T3_reading_fill,
+             colour = T3_reading_NA)) + 
+  geom_point()
+```
+```{r}
+imputed2 %>%
+  bind_shadow() %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = TSH_reading_fill,
+             colour = TSH_reading_NA)) + 
+  geom_point()
+```
+```{r}
+imputed2 %>%
+  bind_shadow() %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = FTI_reading_fill,
+             colour = FTI_reading_NA)) + 
+  geom_point()
+```
+```{r}
+imputed2 %>%
+  bind_shadow() %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = T4U_rate_reading_fill,
+             colour = thyrox_util_rate_T4U_reading_NA)) + 
+  geom_point()
+```
+
+## knn
+
+
 
 
 
