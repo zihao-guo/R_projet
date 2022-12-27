@@ -1,0 +1,83 @@
+---
+title: "R Project"
+output: html_document
+date: "2022-12-20"
+---
+
+```{r setup}
+library(tidyverse)
+library(skimr)
+library(ggplot2)
+library(reshape2)
+library(broom)
+
+library(stats)
+library(readr)
+```
+
+# 1.Importation des données
+```{r}
+data1 <- read.csv("A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+# thyroid <- read_csv("C:/Users/roman/Downloads/thyroid.csv")
+problems(data1)
+
+# Résoudre le problème de jeu des données
+data1$patient_age[which(data1$patient_age =='28;0')] <- 28
+
+# Afficher les données
+DT::datatable(data1)
+```
+
+```{r}
+# Transformation des données en données numériques
+thyroid_cor <- data1
+thyroid_cor$ThryroidClass <- as.numeric(factor(thyroid_cor$ThryroidClass))
+thyroid_cor$ref_src <- as.numeric(factor(thyroid_cor$ref_src))
+thyroid_cor$patient_age_Seg <- as.numeric(factor(thyroid_cor$patient_age_Seg))
+
+model <- lm(sick~., data = thyroid_cor)
+summary(model)
+model%>% glance
+# confint(model)
+```
+```{r}
+zthyroid <- as.data.frame(scale(thyroid_cor))
+zfit <- lm(sick~., data = zthyroid)
+
+as.data.frame(coef(zfit)) %>% 
+  arrange(desc(coef(zfit))) %>% 
+  head(n = 3)
+# Nous pouvons donc voir les trois facteurs les plus susceptibles de provoquer la maladie
+```
+
+```{r}
+model_tidy <- model%>% tidy
+model_tidy[order(-model_tidy$estimate),]
+```
+
+```{r,fig.height=10}
+# Carte de chaleur
+cormtcars <- round(cor(thyroid_cor), 3) # round()Fonction permettant de personnaliser le nombre de décimales
+data <- as.data.frame(cormtcars) %>% # Convertir des matrices en cadres de données
+  mutate(x=rownames(cormtcars)) %>%  # Créer une nouvelle colonne x, qui est constituée de 11 variables d'attribut.
+  melt(id='x') %>%                   # Convertir les données larges en données longues, mieux adaptées aux graphiques ggplot2
+  rename('y'='variable','Corr'='value')  # Changer le nom de la colonne variable en y
+# Déterminer d'abord l'ordre des facteurs des axes x et y lors du tracé.
+list <- rownames(cormtcars)
+list <- factor(list,levels = list)
+ggplot(data,aes(factor(x,levels = list),
+                factor(y,levels = list), # Définir l'ordre des axes x, y pour éviter qu'il ne soit modifié par défaut
+                fill=Corr))+
+  
+# Remplissage des couleurs en fonction des valeurs de pertinence
+geom_tile()+  # Fonctions des blocs de couleur
+scale_fill_gradient2(low = 'Blue',mid = 'white',high ='red',
+                     limits=c(-1,1),breaks=c(-1,-0.5,0,0.5,1))+
+labs(x=NULL,y=NULL)+
+theme_bw(base_size = 15)+
+theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+```
+
+
+
+
