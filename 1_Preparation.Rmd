@@ -212,6 +212,7 @@ thyroid_td %>%
 
 # 3. remplir les valeurs manquantes
 
+
 On peut donc tenter de remplir les valeurs manquantes. Le taux mesuré de toutes ces variables peut dépendre/avoir un lien avec de très nombreuses variables : les taux des autres hormones, l'âge, le genre, l'état malade ou non, les médicaments, etc... Possibilités. Elles peuvent avoir un lien mutuel.
 D'abord on créé une copie des variables
 
@@ -225,7 +226,7 @@ thyroid_td <- mutate(thyroid_td, T4U_rate_reading_fill = thyrox_util_rate_T4U_re
 head(thyroid_td)
 ```
 
-Commençons avec des modèles simples
+I - Linear Models : Not good, DO NOT USE IT
 
 
 On va essayer de modéliser linéairement les variables entre elles, à partir de la matrice des corrélations. Commençons par T3.
@@ -341,7 +342,13 @@ thyroid_impute %>%
 ```
 
 
-# Autre méthode MICE
+II - Mice Package : Better but not the best
+
+Links : 
+https://medium.com/coinmonks/dealing-with-missing-data-using-r-3ae428da2d17
+https://datascienceplus.com/handling-missing-data-with-mice-package-a-simple-approach/
+
+
 
 ```{r}
 thyroid_MICE <- thyroid_td
@@ -404,6 +411,13 @@ imputed %>%
              colour = T4U_rate_reading_fill_NA)) + 
   geom_point()
 ```
+III - miceRanger package - better again
+
+Links : 
+https://github.com/FarrellDay/miceRanger
+https://rdrr.io/cran/miceRanger/man/miceRanger.html
+https://cran.r-project.org/web/packages/miceRanger/vignettes/usingMiceRanger.html
+
 
 ```{r}
 thyroid_MICE2 <- thyroid_td
@@ -434,14 +448,14 @@ miceObj <- miceRanger::miceRanger(
 ```
 
 ```{r}
-plotDistributions(miceObj,vars='allNumeric')
+miceRanger::plotDistributions(miceObj,vars='allNumeric')
 ```
 
 
 
 
 ```{r}
-imputed2 <- completeData(miceObj)[[1]]
+imputed2 <- miceRanger::completeData(miceObj)[[1]]
 sapply(imputed2, function(x) sum(is.na(x)))
 ```
 
@@ -483,11 +497,79 @@ imputed2 %>%
   geom_point()
 ```
 
-## knn
+IV - knn imputation : good results as well, able to deal with missing values in regressors
 
 
+```{r}
+thyroid_knn <- thyroid_td
+thyroid_knn <- impute_knn(thyroid_knn, patient_age ~ ThryroidClass + patient_gender + presc_thyroxine + queried_why_on_thyroxine + presc_anthyroid_meds + sick + pregnant + thyroid_surgery + radioactive_iodine_therapyI131 + query_hypothyroid + query_hyperthyroid + lithium + goitre + tumor + hypopituitarism + psych_condition + TSH_measured + T3_measured + T4_measured + thyrox_util_rate_T4U_measured + FTI_measured + ref_src + T3_reading_fill + T4_reading_fill + TSH_reading_fill + FTI_reading_fill + T4U_rate_reading_fill)
+```
 
 
+```{r}
+thyroid_knn <- impute_knn(thyroid_knn, T3_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_thyroxine + queried_why_on_thyroxine + presc_anthyroid_meds + sick + pregnant + thyroid_surgery + radioactive_iodine_therapyI131 + query_hypothyroid + query_hyperthyroid + lithium + goitre + tumor + hypopituitarism + psych_condition + TSH_measured + T3_measured + T4_measured + thyrox_util_rate_T4U_measured + FTI_measured + ref_src + T4_reading_fill + TSH_reading_fill + FTI_reading_fill + T4U_rate_reading_fill)
+```
+
+```{r}
+thyroid_knn <- impute_knn(thyroid_knn, T4_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_thyroxine + queried_why_on_thyroxine + presc_anthyroid_meds + sick + pregnant + thyroid_surgery + radioactive_iodine_therapyI131 + query_hypothyroid + query_hyperthyroid + lithium + goitre + tumor + hypopituitarism + psych_condition + TSH_measured + T3_measured + T4_measured + thyrox_util_rate_T4U_measured + FTI_measured + ref_src + T3_reading_fill + TSH_reading_fill + FTI_reading_fill + T4U_rate_reading_fill)
+```
+
+```{r}
+thyroid_knn <- impute_knn(thyroid_knn, TSH_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_thyroxine + queried_why_on_thyroxine + presc_anthyroid_meds + sick + pregnant + thyroid_surgery + radioactive_iodine_therapyI131 + query_hypothyroid + query_hyperthyroid + lithium + goitre + tumor + hypopituitarism + psych_condition + TSH_measured + T3_measured + T4_measured + thyrox_util_rate_T4U_measured + FTI_measured + ref_src + T3_reading_fill + T4_reading_fill + FTI_reading_fill + T4U_rate_reading_fill)
+```
+
+
+```{r}
+thyroid_knn <- impute_knn(thyroid_knn, FTI_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_thyroxine + queried_why_on_thyroxine + presc_anthyroid_meds + sick + pregnant + thyroid_surgery + radioactive_iodine_therapyI131 + query_hypothyroid + query_hyperthyroid + lithium + goitre + tumor + hypopituitarism + psych_condition + TSH_measured + T3_measured + T4_measured + thyrox_util_rate_T4U_measured + FTI_measured + ref_src + T3_reading_fill + TSH_reading_fill + T4_reading_fill + T4U_rate_reading_fill)
+```
+
+```{r}
+thyroid_knn <- impute_knn(thyroid_knn, T4U_rate_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_thyroxine + queried_why_on_thyroxine + presc_anthyroid_meds + sick + pregnant + thyroid_surgery + radioactive_iodine_therapyI131 + query_hypothyroid + query_hyperthyroid + lithium + goitre + tumor + hypopituitarism + psych_condition + TSH_measured + T3_measured + T4_measured + thyrox_util_rate_T4U_measured + FTI_measured + ref_src + T3_reading_fill + TSH_reading_fill + FTI_reading_fill + T4_reading_fill)
+```
+
+
+```{r}
+skim(thyroid_knn)
+```
+```{r}
+thyroid_knn %>%
+  bind_shadow() %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = T3_reading_fill,
+             colour = T3_reading_NA)) + 
+  geom_point()
+```
+```{r}
+thyroid_knn %>%
+  bind_shadow() %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = TSH_reading_fill,
+             colour = TSH_reading_NA)) + 
+  geom_point()
+```
+```{r}
+thyroid_knn %>%
+  bind_shadow() %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = FTI_reading_fill,
+             colour = FTI_reading_NA)) + 
+  geom_point()
+```
+```{r}
+thyroid_knn %>%
+  bind_shadow() %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = T4U_rate_reading_fill,
+             colour = thyrox_util_rate_T4U_reading_NA)) + 
+  geom_point()
+```
+
+
+-> Conclusion : need to choose between miceRanger and knn. In the next step thyroid_knn has been used but not sure if it is the best choice
 
 
 
@@ -496,27 +578,35 @@ imputed2 %>%
 
 ```{r}
 # Groupe d'âge
-thyroid_impute <- mutate(thyroid_impute, patient_age_Seg = patient_age)
-thyroid_impute$patient_age_Seg <- as.numeric(factor(thyroid_impute$patient_age_Seg))
+thyroid_knn <- mutate(thyroid_knn, patient_age_Seg = patient_age)
+thyroid_knn$patient_age_Seg <- as.numeric(factor(thyroid_knn$patient_age_Seg))
 
-thyroid_impute$patient_age_Seg<-cut(thyroid_impute$patient_age_Seg,breaks = c(-Inf, 10, 20, 30, 40 ,50 ,60, 70, 80, 90, Inf),labels = c('1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','91-100'))
+thyroid_knn$patient_age_Seg<-cut(thyroid_knn$patient_age_Seg,breaks = c(-Inf, 10, 20, 30, 40 ,50 ,60, 70, 80, 90, Inf),labels = c('1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','91-100'))
 
-thyroid_impute
+thyroid_knn
 ```
+
+
+
 ```{r}
 # Supprimer la colonne vide d'origine et remplissez-la avec les données interpolées.
-Col_na  = c("T3_reading", "T4_reading", "TSH_reading", "FTI_reading", "T4U_rate_reading", 'thyrox_util_rate_T4U_reading') 
-thyroid_tidy = thyroid_impute[,!names(thyroid_impute) %in% Col_na]
+Col_na  = c("T3_reading", "T4_reading", "TSH_reading", "FTI_reading", 'thyrox_util_rate_T4U_reading') 
+thyroid_tidy = thyroid_knn[,!names(thyroid_knn) %in% Col_na]
+colnames(thyroid_tidy)[1] <- "ThyroidClass" #renaming the columns because of a mistake in original writing
 skim(thyroid_tidy)
 
 # Sauvegarder les données nettoyées
 thyroid_tidy %>% write.csv(file = "./A_Datas/thyroid_tidy.csv")
 ```
+```{r}
+thyroid_tidy
+```
+
 
 ```{r}
 # Transformation des données en données numériques
 thyroid_cor <- thyroid_tidy
-thyroid_cor$ThryroidClass <- as.numeric(factor(thyroid_cor$ThryroidClass))
+thyroid_cor$ThyroidClass <- as.numeric(factor(thyroid_cor$ThyroidClass))
 thyroid_cor$ref_src <- as.numeric(factor(thyroid_cor$ref_src))
 thyroid_cor$patient_age_Seg <- as.numeric(factor(thyroid_cor$patient_age_Seg))
 

@@ -16,7 +16,7 @@ Importation des données
 
 ```{r}
 library(readr)
-thyroid <- read_csv("C:/Users/roman/Downloads/thyroid.csv")
+thyroid <- read_csv("../A_Datas/thyroid.csv")
 View(thyroid)
 ```
 ```{r}
@@ -253,14 +253,32 @@ thyroid_impute
 Visualisation des nouvelles données :
 
 ```{r}
+thyroid_td$FTI_reading <- as.numeric(thyroid_td$FTI_reading)
+thyroid_td %>% 
+  ggplot(aes(x = T4_reading, y = FTI_reading)) +
+  geom_point()
+```
+
+
+```{r}
 thyroid_impute %>%
   bind_shadow() %>%
   as.data.frame() %>% 
-  ggplot(aes(x = TSH_reading_fill,
-             y = T4_reading_fill,
-             colour = T4_reading_NA)) + 
+  ggplot(aes(x = T4_reading_fill,
+             y = FTI_reading_fill,
+             colour = FTI_reading_NA)) + 
   geom_point()
 ```
+```{r}
+thyroid_impute %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = TSH_reading_fill,
+             colour = TSH_reading_NA)) + 
+  geom_point()
+```
+
 
 
 
