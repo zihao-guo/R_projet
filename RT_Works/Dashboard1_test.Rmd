@@ -1,0 +1,164 @@
+---
+title: "R Project : Dashboard 1"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    theme: readable
+runtime: shiny
+---
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(glue)
+library(flexdashboard)
+library(shiny)
+library(readr)
+
+thyroid <- read_csv("../A_Datas/thyroid_tidy.csv")
+```
+
+
+
+Column {.sidebar}
+-----------------------------------------------------------
+
+Veuillez entrer le numéro du patient
+
+```{r}
+numericInput(inputId = 'Patient_number', label = "Numéro du patient", value = 1, min = 1, max = nrow(thyroid), step = 1)
+```
+
+
+Column {data-width=400}
+-----------------------------------------------------------
+
+
+
+### Age du patient {.value-box}
+
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = thyroid[input$Patient_number,]$patient_age,
+    caption = "Age du patient",
+    color = if (thyroid[input$Patient_number,]$patient_gender == 0) "aqua" else "pink"
+)})
+```
+
+##Genre
+
+```{r, include = FALSE}
+renderValueBox({
+  valueBox(
+    value = thyroid[input$Patient_number,]$patient_gender,
+    caption = "Genre", 
+    color = if (thyroid[input$Patient_number,]$patient_gender == 0) "aqua" else "pink"
+)})
+```
+
+### Malade ou non {.value-box}
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = if (thyroid[input$Patient_number,]$ThyroidClass == "negative") "Pas malade" else "Malade",
+    color = if (thyroid[input$Patient_number,]$patient_gender == 0) "aqua" else "pink"
+)})
+```
+
+Column {data-width=100}
+-----------------------------------------------------------
+
+
+
+## Taux de T4
+
+
+
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$T4_reading_fill,
+    min = 0,
+    max = max(thyroid$T4_reading_fill),
+    sectors = gaugeSectors(success = c(80, 140), 
+                         warning = c(0, 80), 
+                         danger = c(140, max(thyroid$T4_reading_fill))),
+    symbol = 'nmol/L'
+)})
+```
+
+
+## Taux de T3
+
+
+
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$T3_reading_fill,
+    min = 0,
+    max = max(thyroid$T3_reading_fill),
+    sectors = gaugeSectors(success = c(80, 140), 
+                         warning = c(0, 80), 
+                         danger = c(140, max(thyroid$T3_reading_fill))),
+    symbol = 'nmol/L'
+)})
+```
+
+
+## Taux de TSH
+
+
+
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$TSH_reading_fill,
+    min = 0,
+    max = max(thyroid$TSH_reading_fill),
+    sectors = gaugeSectors(success = c(80, 140), 
+                         warning = c(0, 80), 
+                         danger = c(140, max(thyroid$TSH_reading_fill))),
+    symbol = 'nmol/L'
+)})
+```
+
+## Taux de FTI
+
+
+
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$FTI_reading_fill,
+    min = 0,
+    max = max(thyroid$FTI_reading_fill),
+    sectors = gaugeSectors(success = c(80, 140), 
+                         warning = c(0, 80), 
+                         danger = c(140, max(thyroid$FTI_reading_fill))),
+    symbol = 'nmol/L'
+)})
+```
+
+## Taux de T4U
+
+
+
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$T4U_rate_reading_fill,
+    min = 0,
+    max = max(thyroid$T4U_rate_reading_fill),
+    sectors = gaugeSectors(success = c(80, 140), 
+                         warning = c(0, 80), 
+                         danger = c(140, max(thyroid$T4U_rate_reading_fill))),
+    symbol = 'nmol/L'
+)})
+```
+
+
+
