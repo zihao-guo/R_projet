@@ -12,13 +12,164 @@ library(readr)
 library(ggplot2)
 library(patchwork)
 library(plotly)
+
+library(ggradar)
 ```
 
 # 1.Importation des données
 ```{r}
 data1 <- read.csv("../../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
 ```
-# Visualisation des données
+
+```{r}
+head(data1)
+```
+
+
+```{r}
+data_sick <- data1 %>% 
+  filter(ThyroidClass == "sick") %>% 
+  select(-c(X, sick))
+
+data_T3_reading_fill <- data_sick %>% 
+  group_by(patient_gender) %>% 
+  summarise(count = n(),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(patient_gender) %>% 
+  summarise(count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(patient_gender) %>% 
+  summarise(count = n(),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(patient_gender) %>% 
+  summarise(count = n(),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(patient_gender) %>% 
+  summarise(count = n(),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+  
+```
+
+
+```{r}
+z <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+z <- filter(z, patient_gender==0)
+name <- c("T3_reading",
+        "T4_reading",
+        "TSH_reading",
+        "FTI_reading",
+        "T4U_rate_reading")
+
+z <- cbind(name, z) %>% 
+  select(-(patient_gender))
+```
+
+```{r}
+z %>% write.csv(file = "../../A_Datas/age.csv", row.names=F)
+
+
+z_t <- t(z)
+
+colnames(z_t)<-z_t[1,]
+z_t <- z_t[-1,]
+
+indicateur <- rownames(z_t)
+z_t <- cbind(indicateur, z_t)
+rownames(z_t) <- 1:nrow(z_t)
+
+z_t %>% write.csv(file = "../../A_Datas/age_2.csv")
+```
+
+
+```{r}
+data3 <- read.csv("../../A_Datas/age_2.csv",encoding = 'UTF-8')
+skim(data3)
+```
+```{r}
+data3 %>% 
+  ggplot(aes(T3_reading, T4_reading)) + 
+  geom_point()
+```
+
+```{r}
+ggplot(data=data3,aes(x=indicateur, y=T3_reading)) +
+  geom_polygon(color = "black", fill= "#E41A1C",alpha=0.1)+
+  geom_point(size=3,shape=21,color = 'black', fill= "#E41A1C")+
+  coord_polar() +
+  theme_light()+
+  theme(axis.text.x=element_text(size = 11,colour="black"))
+```
+
+```{r}
+ggplot(data=data2,aes(x=id)) +
+  geom_polygon(aes(y=student1),color = "black", fill= "#ffd200",alpha=0.1)+
+  geom_point(aes(y=student1, fill= "#ffd200"),size=5,shape=21,color = 'black',fill= "#ffd200")+
+  geom_polygon(aes(y=student2),color = "black", fill= "#304156",alpha=0.1)+
+  geom_point(aes(y=student2, fill= "#304156"),size=5,shape=21,color = 'black', fill= "#304156")+
+  geom_polygon(aes(y=student3),color = "black", fill= "#f8766d",alpha=0.1)+
+  geom_point(aes(y=student3, fill= "#f8766d"),size=5,shape=21,color = 'black', fill= "#f8766d")+
+  coord_polar() +
+  scale_x_continuous(breaks =course_data2$id,labels=course_data2$course)+
+  ylim(50,100)+
+  theme_light()+
+  theme(axis.text.x=element_text(size = 11,colour="black"))+
+  xlab("")+ylab("")
+```
+
+
+```{r}
+
+#雷达图3
+ggradar(data2,
+        base.size = 20,
+        values.radar = c("0", "50", "100"),
+        grid.min = 0, grid.mid = 60, grid.max = 120,
+        group.line.width = 1,
+        group.point.size = 3,
+        background.circle.colour = "white",
+        gridline.mid.colour = "grey",
+        
+        legend.title = "Indicators",
+        legend.text.size = 10,
+        plot.title = "A")
+
+```
+
+
+
+```{r}
+z_t <- t(z)
+colnames(z_t)<-z_t[1,]
+
+z_t <- z_t[-1,]
+as.numeric(z_t$T3_reading)
+as.numeric(z_t$T4_reading)
+as.numeric(z_t$TSH_reading)
+as.numeric(z_t$FTI_reading)
+as.numeric(z_t$T4U_rate_reading)
+```
+
+
+
+# [old]Visualisation des données
 
 ```{r}
 ggplot() + geom_bar(data = data1, aes(x = patient_age, fill = ThryroidClass), stat = "count",position = "dodge")+ scale_fill_brewer(palette = 'Accent')
