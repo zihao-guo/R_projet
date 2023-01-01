@@ -3,8 +3,7 @@ title: "R Project : Dashboard 3"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
-    social: menu
-    source_code: embed
+    vertical_layout: fill
 runtime: shiny
 ---
 
@@ -17,49 +16,123 @@ library(readr)
 
 library(ggradar)
 
-thyroid <- read_csv("../A_Datas/thyroid_tidy.csv")
-data3 <- read.csv("../A_Datas/age.csv",encoding = 'UTF-8')
+data <- read.csv("../A_Datas/age_3.csv",encoding = 'UTF-8')
+
+data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
 ```
 
 
-
-Ⅲ.Comparision {data-orientation=rows}
-=======================================================================
-
-Column {.sidebar}
+Input {.sidebar}
 -----------------------------------------------------------
 
-Veuillez entrer le numéro du patient
 
 ```{r}
-numericInput(inputId = 'Patient_number', label = "Numéro du patient", value = 1, min = 1, max = nrow(thyroid), step = 1)
+type <- c('data1', 'data2', 'data3', 'data4')
+
+selectInput('xcol', 'X Variable', colnames(data1)[25:29],
+                selected=colnames(data1)[[25]])
+
+selectInput('ycol', 'Y Variable', colnames(data1)[25:29],
+                selected=colnames(data1)[[26]])
+
+selectInput('var', 'Variable', c(colnames(data1)[2:24],colnames(data1)[30]),
+                selected=colnames(data1)[[5]])
 
 # Définir la barre latérale (onglets)
-sliderInput("bw_adjust", label = "Bandwidth adjustment:",
-            min = 0, max = 10, value = 1, step = 1)
+# selectInput('data', 'data_name', type,
+ #               selected=type[[1]])
+
+#selectInput("variable",  # 传入变量名称
+ #           "选择变量：", # 提示文字
+  #          # 选项内容，左边是显示字符，右边是传入变量名称，若是向量传递则字符与变量相同
+   #         list("male" = "0",
+    #             "female" = "1"))
+    
+# varSelectInput("variable", "Variable:", data)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Numerical variable comparison
+
+```{r, fig.height=10}
+data2 <- data1 %>% 
+  filter(ThyroidClass == "sick")
+
+renderPlot({
+  ggplot(data=data2, 
+         mapping = aes_string(x = input$xcol,
+                       y = input$ycol,
+                       color = input$var)) + 
+  geom_point() +
+    labs(
+    x = as.character(input$xcol),
+    y = as.character(input$ycol),
+    # title = "Numerical variable comparison",
+    subtitle = " ",
+    caption = "Data source: Aymeric Stamm"  )
+})
 ```
 
 
-
-Row {data-width=350}
+Column {.tabset .tabset-fade}
 -----------------------------------------------------------------------
-### Chart C
+### Female
 
-```{r}
-#雷达图3
+```{r, fig.height=10}
+data4 <- data %>% 
+  filter(patient_gender != 0) %>% # input$variable
+  select(-(patient_gender)) %>% 
+  mutate(id = c(1:6))
+
 renderPlot({
-ggradar(data3,
-        base.size = 20,
-        values.radar = c("0", "50", "100"),
-        grid.min = 0, grid.mid = 60, grid.max = 120,
-        group.line.width = 1,
-        group.point.size = 3,
-        background.circle.colour = "white",
-        gridline.mid.colour = "grey",
-        
-        legend.title = "Indicators",
-        legend.text.size = 10,
-        plot.title = "A")
+  ggplot(data=data4, aes(x=id)) +
+  geom_polygon(aes(y=standard),color = "black", fill= "#ffd200",alpha=0.1)+
+  geom_point(aes(y=standard, fill= "#ffd200"),size=5,shape=21,color = 'black',fill= "#ffd200")+
+  
+  geom_polygon(aes(y=mean),color = "black", fill= "#304156",alpha=0.1)+
+  geom_point(aes(y=mean, fill= "#304156"),size=5,shape=21,color = 'black', fill= "#304156")+
+  
+  geom_polygon(aes(y=median),color = "black", fill= "#f8766d",alpha=0.1)+
+  geom_point(aes(y=median, fill= "#f8766d"),size=5,shape=21,color = 'black', fill= "#f8766d")+
+  
+  coord_polar() +
+  scale_x_continuous(breaks =data4$id,labels=data4$name)+
+  theme_light()+
+  theme(axis.text.x=element_text(size = 8,colour="black"))+
+    labs(
+    title = "Comparison of female indicators",
+    subtitle = " ",
+    caption = "Data source: Aymeric Stamm"  )
+})
+```
+### Male
+```{r, fig.height=10}
+data4 <- data %>% 
+  filter(patient_gender != 1) %>% # input$variable
+  select(-(patient_gender)) %>% 
+  mutate(id = c(1:6))
+
+renderPlot({
+  ggplot(data=data4, aes(x=id)) +
+  geom_polygon(aes(y=standard),color = "black", fill= "#ffd200",alpha=0.1)+
+  geom_point(aes(y=standard, fill= "#ffd200"),size=5,shape=21,color = 'black',fill= "#ffd200")+
+  
+  geom_polygon(aes(y=mean),color = "black", fill= "#304156",alpha=0.1)+
+  geom_point(aes(y=mean, fill= "#304156"),size=5,shape=21,color = 'black', fill= "#304156")+
+  
+  geom_polygon(aes(y=median),color = "black", fill= "#f8766d",alpha=0.1)+
+  geom_point(aes(y=median, fill= "#f8766d"),size=5,shape=21,color = 'black', fill= "#f8766d")+
+  
+  coord_polar() +
+  scale_x_continuous(breaks =data4$id,labels=data4$name)+
+  theme_light()+
+  theme(axis.text.x=element_text(size = 8,colour="black"))+
+    labs(
+    title = "Comparison of male indicators",
+    subtitle = " ",
+    caption = "Data source: Aymeric Stamm"  )
 })
 ```
 

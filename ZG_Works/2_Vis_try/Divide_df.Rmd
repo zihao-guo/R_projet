@@ -29,36 +29,36 @@ head(data1)
 ```{r}
 data_sick <- data1 %>% 
   filter(ThyroidClass == "sick") %>% 
-  select(-c(X))
+  select(-c(X, sick))
 
 data_T3_reading_fill <- data_sick %>% 
   group_by(patient_gender) %>% 
-  summarise(standard = sd(T3_reading_fill),
+  summarise(count = n(),
             mean = mean(T3_reading_fill), 
             median = median(T3_reading_fill))
 
 
 data_T4_reading_fill <- data_sick %>% 
   group_by(patient_gender) %>% 
-  summarise(standard = sd(T4_reading_fill), # count = n(),
+  summarise(count = n(),
             mean = mean(T4_reading_fill), 
             median = median(T4_reading_fill))
 
 data_TSH_reading_fill <- data_sick %>% 
   group_by(patient_gender) %>% 
-  summarise(standard = sd(TSH_reading_fill),
+  summarise(count = n(),
             mean = mean(TSH_reading_fill), 
             median = median(TSH_reading_fill))
   
 data_FTI_reading_fill <- data_sick %>% 
   group_by(patient_gender) %>% 
-  summarise(standard = sd(FTI_reading_fill),
+  summarise(count = n(),
             mean = mean(FTI_reading_fill), 
             median = median(FTI_reading_fill))
   
 data_T4U_rate_reading_fill <- data_sick %>% 
   group_by(patient_gender) %>% 
-  summarise(standard = sd(T4U_rate_reading_fill),
+  summarise(count = n(),
             mean = mean(T4U_rate_reading_fill), 
             median = median(T4U_rate_reading_fill))
   
@@ -71,16 +71,15 @@ z <- rbind(data_T3_reading_fill,
            data_TSH_reading_fill,
            data_FTI_reading_fill, 
            data_T4U_rate_reading_fill)
-# z <- filter(z, patient_gender==0)
+z <- filter(z, patient_gender==0)
 name <- c("T3_reading",
         "T4_reading",
         "TSH_reading",
         "FTI_reading",
         "T4U_rate_reading")
 
-z <- cbind(name, z) 
-# %>% 
-  # select(-(patient_gender))
+z <- cbind(name, z) %>% 
+  select(-(patient_gender))
 ```
 
 ```{r}
@@ -96,77 +95,28 @@ indicateur <- rownames(z_t)
 z_t <- cbind(indicateur, z_t)
 rownames(z_t) <- 1:nrow(z_t)
 
-z_t %>% write.csv(file = "../../A_Datas/age_2.csv", row.names=F)
+z_t %>% write.csv(file = "../../A_Datas/age_2.csv")
 ```
 
 
 ```{r}
-data3 <- read.csv("../../A_Datas/age.csv",encoding = 'UTF-8')
+data3 <- read.csv("../../A_Datas/age_2.csv",encoding = 'UTF-8')
+skim(data3)
+```
+```{r}
+data3 %>% 
+  ggplot(aes(T3_reading, T4_reading)) + 
+  geom_point()
 ```
 
 ```{r}
-AddRow=c(NA, 
-         nrow(data3)+1, 
-         data3[1,(ncol(data3)-2):ncol(data3)])
-data3 <- rbind(data3, as.numeric(AddRow))
-data3 %>% write.csv(file = "../../A_Datas/age_3.csv", row.names=F)
-```
-
-
-```{r}
-data4 <- data3 %>% 
-  filter(patient_gender!=1) %>% 
-  select(-(patient_gender)) %>% 
-  mutate(id = c(1:6))
-
-ggplot(data=data4, aes(x=id, y=mean)) +
+ggplot(data=data3,aes(x=indicateur, y=T3_reading)) +
   geom_polygon(color = "black", fill= "#E41A1C",alpha=0.1)+
-  geom_point(size=2,shape=10,color = 'black', fill= "#E41A1C")+
+  geom_point(size=3,shape=21,color = 'black', fill= "#E41A1C")+
   coord_polar() +
-  scale_x_continuous(breaks =data4$id,labels=data4$name)+
   theme_light()+
-  theme(axis.text.x=element_text(size = 10,colour="black"))
+  theme(axis.text.x=element_text(size = 11,colour="black"))
 ```
-```{r, fig.height=10}
-data4 <- data3 %>% 
-  filter(patient_gender!=1) %>% 
-  select(-(patient_gender)) %>% 
-  mutate(id = c(1:6))
-
-ggplot(data=data4, aes(x=id)) +
-  geom_polygon(aes(y=standard),color = "black", fill= "#ffd200",alpha=0.1)+
-  geom_point(aes(y=standard, fill= "#ffd200"),size=5,shape=21,color = 'black',fill= "#ffd200")+
-  
-  geom_polygon(aes(y=mean),color = "black", fill= "#304156",alpha=0.1)+
-  geom_point(aes(y=mean, fill= "#304156"),size=5,shape=21,color = 'black', fill= "#304156")+
-  
-  geom_polygon(aes(y=median),color = "black", fill= "#f8766d",alpha=0.1)+
-  geom_point(aes(y=median, fill= "#f8766d"),size=5,shape=21,color = 'black', fill= "#f8766d")+
-  
-  coord_polar() +
-  scale_x_continuous(breaks =data4$id,labels=data4$name)+
-  theme_light()+
-  theme(axis.text.x=element_text(size = 10,colour="black"))
-```
-
-```{r}
-# 仪表盘！！！
-renderPlot({
-ggradar(data,
-        base.size = 20,
-        values.radar = c("0", "50", "100"),
-        grid.min = 0, grid.mid = 60, grid.max = 120,
-        group.line.width = 1,
-        group.point.size = 3,
-        background.circle.colour = "white",
-        gridline.mid.colour = "grey",
-        
-        legend.title = "Indicators",
-        legend.text.size = 10,
-        plot.title = "A")
-})
-```
-
 
 ```{r}
 ggplot(data=data2,aes(x=id)) +
