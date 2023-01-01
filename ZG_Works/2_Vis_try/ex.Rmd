@@ -1,0 +1,62 @@
+---
+title: "Untitled"
+author: "ZG"
+date: "2023-01-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+course_data1=data.frame(
+  student=paste0("Student",1:3),
+  Language=c(85,71,99),
+  Math=c(90,50,82),
+  English=c(77,90,85),
+  Physics=c(89,67,78),
+  Chemistry=c(78,88,60),
+  Biology=c(89,60,80)
+  )
+course_data2=data.frame(
+  course=c("Language","Math","English","Physics","Chemistry","Biology"),
+  id=c(1:6),
+  student1=c(85,90,77,89,78,89),
+  student2=c(71,50,90,67,88,60),
+  student3=c(99,82,85,78,60,80)
+)
+AddRow=c(NA,nrow(course_data2)+1, course_data2[1,(ncol(course_data2)-2):ncol(course_data2)])
+data2=rbind(course_data2,as.numeric(AddRow))
+```
+
+```{r}
+head(course_data1)
+```
+```{r}
+ggplot(data=data2,aes(x=id, y=student1)) +
+  geom_polygon(color = "black", fill= "#E41A1C",alpha=0.1)+
+  geom_point(size=5,shape=21,color = 'black', fill= "#E41A1C")+
+  coord_polar() +
+  scale_x_continuous(breaks =course_data2$id,labels=course_data2$course)+
+  ylim(50,100)+
+  theme_light()+
+  theme(axis.text.x=element_text(size = 11,colour="black"))
+```
+
+
+```{r}
+ggradar(
+  course_data1,
+  values.radar = c("0", "50", "100"),
+  grid.min = 0, grid.mid = 50, grid.max = 100,
+  group.line.width = 1,
+  group.point.size = 3,
+  group.colours = c("#ffd200", "#304156", "#f8766d"),
+  background.circle.colour = "white",
+  gridline.mid.colour = "grey",
+  legend.position = "bottom"
+) 
+```
+

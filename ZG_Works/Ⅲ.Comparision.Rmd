@@ -1,0 +1,65 @@
+---
+title: "R Project : Dashboard 3"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    social: menu
+    source_code: embed
+runtime: shiny
+---
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(flexdashboard)
+library(shiny)
+library(readr)
+
+library(ggradar)
+
+thyroid <- read_csv("../A_Datas/thyroid_tidy.csv")
+data3 <- read.csv("../A_Datas/age.csv",encoding = 'UTF-8')
+```
+
+
+
+Ⅲ.Comparision {data-orientation=rows}
+=======================================================================
+
+Column {.sidebar}
+-----------------------------------------------------------
+
+Veuillez entrer le numéro du patient
+
+```{r}
+numericInput(inputId = 'Patient_number', label = "Numéro du patient", value = 1, min = 1, max = nrow(thyroid), step = 1)
+
+# Définir la barre latérale (onglets)
+sliderInput("bw_adjust", label = "Bandwidth adjustment:",
+            min = 0, max = 10, value = 1, step = 1)
+```
+
+
+
+Row {data-width=350}
+-----------------------------------------------------------------------
+### Chart C
+
+```{r}
+#雷达图3
+renderPlot({
+ggradar(data3,
+        base.size = 20,
+        values.radar = c("0", "50", "100"),
+        grid.min = 0, grid.mid = 60, grid.max = 120,
+        group.line.width = 1,
+        group.point.size = 3,
+        background.circle.colour = "white",
+        gridline.mid.colour = "grey",
+        
+        legend.title = "Indicators",
+        legend.text.size = 10,
+        plot.title = "A")
+})
+```
+
