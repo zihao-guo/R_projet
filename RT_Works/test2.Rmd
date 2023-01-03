@@ -1,0 +1,286 @@
+---
+title: "R Project : Dashboard 1"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    theme: lumen
+runtime: shiny
+---
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(glue)
+library(flexdashboard)
+library(shiny)
+library(readr)
+
+thyroid <- read_csv("../A_Datas/thyroid_tidy.csv")
+```
+
+
+
+Column {.sidebar}
+-----------------------------------------------------------
+
+Please enter the patient's number
+
+```{r}
+numericInput(inputId = 'Patient_number', label = "Patient's number", value = 1, min = 1, max = nrow(thyroid), step = 1)
+```
+
+
+Row
+-----------------------------------------------------------
+
+
+### Patient's gender
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = if (thyroid[input$Patient_number,]$patient_gender == 1) "Woman" else "Man",
+    caption = "Gender", 
+    icon = "fa-venus-mars",
+    color = if (thyroid[input$Patient_number,]$patient_gender == 0) "#3fc5f0" else "#a8e6cf"
+)})
+
+renderValueBox({
+    valueBox(
+      value = if (thyroid[input$Patient_number, ]$pregnant == 1) { "Pregnant" },
+      color = if (thyroid[input$Patient_number,]$patient_gender == 0) "#3fc5f0" else "#a8e6cf"
+    )
+  })
+
+```
+
+### Patient's age {.value-box}
+
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = thyroid[input$Patient_number,]$patient_age,
+    caption = "Age",
+    icon = "fa-user",
+    color = if (thyroid[input$Patient_number,]$patient_gender == 0) "#42dee1" else "#dcedc1"
+)})
+```
+
+### Thyroïd state {.value-box}
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = if (thyroid[input$Patient_number,]$ThyroidClass == "negative") "Healthy" else "Sick",
+    icon = "fa-notes-medical",
+    color = if (thyroid[input$Patient_number, ]$ThyroidClass == "sick") "#e70000" else if (thyroid[input$Patient_number,]$patient_gender == 0) "#6decb9" else "#ffd3b6"
+)})
+```
+
+
+### Patient's referral source
+
+```{r}
+renderValueBox({
+    valueBox(
+      value = thyroid[input$Patient_number, ]$ref_src,
+      icon = 'fa-asterisk',
+      color = if (thyroid[input$Patient_number,]$patient_gender == 0) "#eef5b2" else "#ffaaa5"
+    )
+  })
+```
+
+
+
+
+Row
+-----------------------------------------------------------
+
+
+
+### T4 rate
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$T4_reading_fill,
+    min = 0,
+    max = max(thyroid$T4_reading_fill),
+    sectors = gaugeSectors(success = c(80, 140), 
+                         warning = c(0, 80), 
+                         danger = c(140, max(thyroid$T4_reading_fill)),
+                         colors = if (thyroid[input$Patient_number, ]$patient_gender == 1) c("PaleGreen", "Crimson", "Crimson") else
+                           c("SeaGreen", "Brown", "Brown")),
+    symbol = 'U'
+)})
+```
+
+### T3 rate
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$T3_reading_fill,
+    min = 0,
+    max = max(thyroid$T3_reading_fill),
+    sectors = gaugeSectors(success = c(0.6, 2.2), 
+                         warning = c(0, 0.6), 
+                         danger = c(2.2, max(thyroid$T3_reading_fill)),
+                         colors = if (thyroid[input$Patient_number, ]$patient_gender == 1) c("PaleGreen", "Crimson", "Crimson") else
+                           c("SeaGreen", "Brown", "Brown")),
+    symbol = 'U'
+)})
+```
+
+### TSH rate
+
+ 
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$TSH_reading_fill,
+    min = 0,
+    max = max(thyroid$TSH_reading_fill),
+    sectors = gaugeSectors(success = c(0.4, 4), 
+                         warning = c(0, 0.4), 
+                         danger = c(4, max(thyroid$TSH_reading_fill)),
+                         colors = if (thyroid[input$Patient_number, ]$patient_gender == 1) c("PaleGreen", "Crimson", "Crimson") else
+                           c("SeaGreen", "Brown", "Brown")),
+    symbol = 'U'
+)})
+```
+
+
+### FTI rate
+
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$FTI_reading_fill,
+    min = 0,
+    max = max(thyroid$FTI_reading_fill),
+    sectors = gaugeSectors(success = c(60, 120), 
+                         warning = c(0, 60), 
+                         danger = c(120, max(thyroid$FTI_reading_fill)),
+                         colors = if (thyroid[input$Patient_number, ]$patient_gender == 1) c("PaleGreen", "Crimson", "Crimson") else
+                           c("SeaGreen", "Brown", "Brown")),
+    symbol = 'U'
+)})
+```
+
+### T4U rate
+
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$T4U_rate_reading_fill,
+    min = 0,
+    max = max(thyroid$T4U_rate_reading_fill),
+    sectors = gaugeSectors(success = c(0.7, 0.9), 
+                         warning = c(0, 0.7), 
+                         danger = c(0.9, max(thyroid$T4U_rate_reading_fill)),
+                         colors = if (thyroid[input$Patient_number, ]$patient_gender == 1) c("PaleGreen", "Crimson", "Crimson") else
+                           c("SeaGreen", "Brown", "Brown")),
+    symbol = 'U'
+)})
+```
+
+
+Row 
+-----------------------------------------------------------
+
+### Treatments & Operations
+
+
+```{r}
+DT::renderDataTable({
+  treat_vect <- c()
+  if (thyroid[input$Patient_number, ]$presc_thyroxine == 1) {
+    treat_vect <- append(treat_vect, "Thyroxine presciption")
+  }
+  if (thyroid[input$Patient_number, ]$presc_anthyroid_meds == 1) { 
+    treat_vect <- append(treat_vect, "Anti-thyroid medicine presciption")
+  }
+  if (thyroid[input$Patient_number, ]$radioactive_iodine_therapyI131 == 1) { 
+    treat_vect <- append(treat_vect, "Radioactive iodine treatment")
+  }
+  if (thyroid[input$Patient_number, ]$lithium == 1) { 
+    treat_vect <- append(treat_vect, "Lithium treatment")
+  }
+  if (thyroid[input$Patient_number, ]$thyroid_surgery == 1) {
+    treat_vect <- append(treat_vect, "Thyroid surgery")
+  }
+  if (length(treat_vect) == 0) {
+    treat_vect <- append(treat_vect, "No treatments or operations")
+  }
+  data <- data.frame("Treatments" = treat_vect)
+  DT::datatable(data, options = list(
+    bPaginate = FALSE
+  ))
+})
+```
+
+
+
+
+
+
+### Queries
+
+
+```{r}
+DT::renderDataTable({
+  query_vect <- c()
+  if (thyroid[input$Patient_number, ]$queried_why_on_thyroxine == 1) {
+    query_vect <- append(query_vect, "Query on why is the patient on thyroxine prescription")
+  }
+  if (thyroid[input$Patient_number, ]$query_hypothyroid == 1) { 
+    query_vect <- append(query_vect, "Under active thyroid query")
+  }
+  if (thyroid[input$Patient_number, ]$query_hyperthyroid == 1) { 
+    query_vect <- append(query_vect, "Over active thyroid query")
+  }
+  if (length(query_vect) == 0) {
+    query_vect <- append(query_vect, "No ongoing queries")
+  }
+  data <- data.frame("Queries" = query_vect)
+  DT::datatable(data, options = list(
+    bPaginate = FALSE
+  ))
+})
+```
+
+
+
+
+### Symptoms & Diagnosis
+
+
+```{r}
+DT::renderDataTable({
+  diag_vect <- c()
+  if (thyroid[input$Patient_number, ]$goitre == 1) {
+    diag_vect <- append(diag_vect, "Goitre")
+  }
+  if (thyroid[input$Patient_number, ]$tumor == 1) { 
+    diag_vect <- append(diag_vect, "Tumor")
+  }
+  if (thyroid[input$Patient_number, ]$hypopituitarism == 1) { 
+    diag_vect <- append(diag_vect, "Under active thyroid")
+  }
+  if (thyroid[input$Patient_number, ]$sick == 1) {
+    diag_vect <-append(diag_vect, "Sickness due to thyroxine depletion or over activity")
+  }
+  if (thyroid[input$Patient_number, ]$psych_condition == 1) {
+    diag_vect <-append(diag_vect, "Psychological condition")
+  }
+  if (length(diag_vect) == 0) {
+    diag_vect <- append(diag_vect, "No symptoms or diagnosis")
+  }
+  data <- data.frame("Symptômes et diagnostics" = diag_vect)
+  DT::datatable(data, options = list(
+    bPaginate = FALSE
+  ))
+})
+```
+
+

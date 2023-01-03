@@ -1,0 +1,290 @@
+---
+title: "R Project"
+output: html_document
+date: "2022-12-20"
+---
+
+```{r setup}
+library(tidyverse)
+library(skimr)
+library(janitor)
+library(naniar)
+library(simputation)
+```
+
+Importation des données
+
+```{r}
+library(readr)
+thyroid <- read_csv("../A_Datas/thyroid.csv")
+View(thyroid)
+```
+```{r}
+skim(thyroid)
+```
+
+
+
+```{r}
+thyroid_raw <- thyroid
+glimpse(thyroid_raw)
+```
+```{r}
+thyroid_td <- thyroid_raw %>% 
+  remove_empty(c("rows", "cols")) %>%
+  remove_constant(na.rm = FALSE, quiet = FALSE)
+thyroid_td
+```
+
+Missing Values
+
+```{r}
+skim(thyroid_td) %>% 
+  filter(n_missing > 0)
+```
+
+
+```{r}
+gg_miss_var(thyroid_td)
+```
+```{r}
+thyroid_td %>% 
+  ggplot(mapping = aes(x = patient_age, y = T3_reading)) +
+  geom_miss_point()
+```
+```{r}
+thyroid_td %>% 
+  ggplot(mapping = aes(x = patient_age, y = thyrox_util_rate_T4U_reading)) +
+  geom_miss_point()
+```
+```{r}
+thyroid_td %>% 
+  ggplot(mapping = aes(x = patient_age, y = FTI_reading)) +
+  geom_miss_point()
+```
+```{r}
+thyroid_td %>% 
+  ggplot(mapping = aes(x = patient_age, y = TSH_reading)) +
+  geom_miss_point()
+```
+Première variable : T3_reading
+
+T3_measured est une variable binaire (0 ou 1) indiquant si oui ou non un test du taux de T3 a été réalisé. Les valeurs manquantes dans la colonne T3_reading correspondent à un test non réalisé (T3_measured == 0), comme confirmé avec le code ci-dessous :
+
+```{r}
+thyroid_td %>% 
+  filter(is.na(T3_reading) & (T3_measured != 0))
+```
+
+On notera également la présence d'une ligne dans laquelle les données semblent avoir été mélangées. En effet, le code ci-dessous renvoie une ligne où T3_measured a la valeur 1.8 et T3_reading a la valeur 1. Il semble raisonnable de penser que ceux deux valeurs ont été inversées, 1.8 étant de l'ordre de grandeur des autres valeurs de la colonne T3_reading. De même, on peut penser que T4_measured et T4_reading ont été inversées, TSH_measured et TSH_reading aussi, ainsi que thyrox_util_rate_T4U_measured et thyrox_util_rate_T4U_reading. FTI_measured devrait être égal à 1, puisqu'on dispose bel et bien d'une valeur pour FTI_reading (119), qui ont été inversées. On peut donc soit échanger les valeurs, soit considérer que la ligne contient trop d'erreurs pour être utilisée. Pour le moment, je vais échanger les valeurs.
+
+```{r}
+thyroid_td %>% 
+  filter(T3_measured != 1 & T3_measured != 0)
+```
+```{r}
+ind <- which(!(thyroid_td$T3_measured %in% c(0, 1)))
+ind
+```
+```{r}
+thyroid_td[15,]
+```
+```{r}
+thyroid_td$T3_measured[15]
+```
+
+```{r}
+#Code très laid
+thyroid_td[15, 21] <- thyroid_td$T3_measured[15]
+thyroid_td[15, 20] <- 1
+thyroid_td[15, 19] <- thyroid_td$TSH_measured[15]
+thyroid_td[15, 18] <- 1
+thyroid_td[15, 23] <- thyroid_td$T4_measured[15]
+thyroid_td[15, 22] <- 1
+thyroid_td[15, 25] <- thyroid_td$thyrox_util_rate_T4U_measured[15]
+thyroid_td[15, 24] <- 1
+thyroid_td[15, 27] <- thyroid_td$FTI_measured[15]
+thyroid_td[15, 26] <- 1
+thyroid_td
+```
+thyrox_util_rate_T4U_reading
+
+thyrox_util_rate_T4U_measured est une variable binaire. Un NA à cette variable correspond à une absence de mesure.
+
+```{r}
+thyroid_td %>% 
+  filter(is.na(thyrox_util_rate_T4U_reading) & (thyrox_util_rate_T4U_measured != 0))
+```
+Il n'y a pas d'erreur sur la variable d'indication binaire cette fois : 
+
+```{r}
+thyroid_td %>% 
+  filter(!(thyrox_util_rate_T4U_measured %in% c(0, 1)))
+```
+FTI_reading
+
+FTI_measured variable binaire correspondante. NA = donnée non mesurée
+
+```{r}
+thyroid_td %>% 
+  filter(is.na(FTI_reading) & FTI_measured != 0)
+```
+Pas d'erreur sur la variable d'indication binaire :
+
+```{r}
+thyroid_td %>% 
+  filter(!(FTI_measured %in% c(0,1)))
+```
+
+TSH_reading
+
+TSH_measured variable binaire correspondante.
+```{r}
+thyroid_td %>% 
+  filter(is.na(TSH_reading) & TSH_measured != 0)
+```
+Pas d'erreur sur la variable d'indication
+
+```{r}
+thyroid_td %>% 
+  filter(!(TSH_measured %in% c(0,1)))
+```
+
+T4_reading
+
+T4_measured variable binaire correspondante.
+
+```{r}
+thyroid_td %>% 
+  filter(is.na(T4_reading) & T4_measured != 0)
+```
+Pas d'erreur d'indication 
+
+```{r}
+thyroid_td %>% 
+  filter(!(T4_measured %in% c(0,1)))
+```
+
+
+
+ 
+
+
+On peut donc tenter de remplir les valeurs manquantes. Le taux mesuré de toutes ces variables peut dépendre/avoir un lien avec de très nombreuses variables : les taux des autres hormones, l'âge, le genre, l'état malade ou non, les médicaments, etc... Possibilités. Elles peuvent avoir un lien mutuel.
+D'abord on créé une copie des variables
+
+```{r}
+thyroid_td <- mutate(thyroid_td, T3_reading_fill = T3_reading)
+thyroid_td <- mutate(thyroid_td, T4_reading_fill = T4_reading)
+thyroid_td <- mutate(thyroid_td, TSH_reading_fill = TSH_reading) 
+thyroid_td <- mutate(thyroid_td, FTI_reading_fill = FTI_reading)
+thyroid_td <- mutate(thyroid_td, T4U_rate_reading_fill = thyrox_util_rate_T4U_reading)
+```
+
+```{r}
+thyroid_td
+```
+
+Commençons avec des modèles simples
+
+
+Le problème majeur est donc de modéliser les taux de T3 et T4. C'est un peu plus compliqué. On va essayer de modéliser en prenant en compte toutes les variables où il ne manque pas de valeurs (patient_age excepté). Ce sont toutes des variables catégorielles. L'idée est que des patients aux caractéristiques similaires doivent avoir des taux similaires.
+
+```{r}
+thyroid_impute <- thyroid_td
+thyroid_impute <- impute_lm(thyroid_impute, T4_reading_fill + T3_reading_fill ~ ThryroidClass + patient_age + patient_gender + presc_thyroxine + queried_why_on_thyroxine + presc_anthyroid_meds + sick + pregnant + thyroid_surgery + radioactive_iodine_therapyI131 + query_hypothyroid + query_hyperthyroid + lithium + goitre + tumor + hypopituitarism + psych_condition)
+thyroid_impute
+```
+
+A FTI_reading. D'après internet, FTI = T4/thyroid binding capacity. Il ne me semble pas exister de variable donnant le TGB ici (thyroid binding capacity). Tentons un modèle linéaire en fonction du taux de T4
+
+
+```{r}
+thyroid_impute <- impute_lm(thyroid_impute, FTI_reading_fill ~ T4_reading_fill)
+thyroid_impute
+```
+
+
+On a des résultats, sauf dans les lignes où T4 est NA.
+
+
+De même, le taux de TSH est lié à ceux de T3 et T4. Un taux de TSH élevé est lié à un taux de T3 ou T4 faible et inversement.
+
+```{r}
+thyroid_impute <- impute_lm(thyroid_impute, TSH_reading_fill ~ T3_reading_fill + T4_reading_fill)
+thyroid_impute
+```
+
+
+D'après internet, on peut dire que T4U varie avec l'âge, la grossesse, T4 et T3
+
+```{r}
+thyroid_impute <- impute_lm(thyroid_impute, T4U_rate_reading_fill ~ T3_reading_fill + T4_reading_fill + patient_age + pregnant)
+thyroid_impute
+```
+
+
+```{r}
+skim(thyroid_impute)
+```
+
+Les variables fill sont complétées. Il ne reste que l'âge manquant des deux patients.
+
+```{r}
+thyroid_impute %>% 
+  filter(is.na(patient_age))
+```
+Seul l'âge manque dans ces lignes
+
+```{r}
+thyroid_impute <- impute_lm(thyroid_impute, patient_age ~ ThryroidClass + presc_thyroxine + presc_anthyroid_meds + sick + thyroid_surgery + radioactive_iodine_therapyI131 + lithium + goitre + tumor + hypopituitarism + psych_condition + TSH_reading + T3_reading + T4_reading + thyrox_util_rate_T4U_reading + FTI_reading)
+thyroid_impute
+```
+```{r}
+thyroid_impute[2] <- round(thyroid_impute[2], 0)
+```
+
+```{r}
+thyroid_impute
+```
+
+!! Attention c'était une première approche très grossière. Il faut peut-être creuser les liens entre les variables (faire des graphes rapides en amont). Je n'ai pas rempli la colonne ref_src.
+
+Visualisation des nouvelles données :
+
+```{r}
+thyroid_td$FTI_reading <- as.numeric(thyroid_td$FTI_reading)
+thyroid_td %>% 
+  ggplot(aes(x = T4_reading, y = FTI_reading)) +
+  geom_point()
+```
+
+
+```{r}
+thyroid_impute %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = FTI_reading_fill,
+             colour = FTI_reading_NA)) + 
+  geom_point()
+```
+```{r}
+thyroid_impute %>%
+  bind_shadow() %>%
+  as.data.frame() %>% 
+  ggplot(aes(x = T4_reading_fill,
+             y = TSH_reading_fill,
+             colour = TSH_reading_NA)) + 
+  geom_point()
+```
+
+
+
+
+
+
+
+
+
+
