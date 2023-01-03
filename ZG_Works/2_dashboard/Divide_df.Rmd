@@ -1,0 +1,1082 @@
+---
+title: "Vis"
+author: "ZG"
+date: "2022-12-25"
+output: html_document
+---
+```{r setup}
+library(tidyverse)
+library(skimr)
+library(readr)
+```
+
+# 1.Importation des données
+```{r}
+data1 <- read.csv("../../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+head(data1)
+```
+```{r}
+data_sick <- data1 %>% 
+  filter(ThyroidClass == "sick") %>% 
+  select(-X)
+```
+
+## 1. patient_gender
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(patient_gender) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(patient_gender) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(patient_gender) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(patient_gender) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(patient_gender) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "patient_gender") %>% 
+  rename(p_n = patient_gender) 
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_1 <- cbind(name, df_patient_gender)
+```
+
+## 2. "presc_thyroxine"  
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(presc_thyroxine) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(presc_thyroxine) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(presc_thyroxine) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(presc_thyroxine) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(presc_thyroxine) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "presc_thyroxine") %>% 
+  rename(p_n = presc_thyroxine) 
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_2 <- cbind(name, df_patient_gender)
+```
+## 3. "queried_why_on_thyroxine"
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(queried_why_on_thyroxine) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(queried_why_on_thyroxine) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(queried_why_on_thyroxine) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(queried_why_on_thyroxine) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(queried_why_on_thyroxine) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "queried_why_on_thyroxine")  %>% 
+  rename(p_n = queried_why_on_thyroxine) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_3 <- cbind(name, df_patient_gender) # 改数
+```
+## 4. "presc_anthyroid_meds"  
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(presc_anthyroid_meds) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(presc_anthyroid_meds) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(presc_anthyroid_meds) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(presc_anthyroid_meds) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(presc_anthyroid_meds) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "presc_anthyroid_meds")  %>% 
+  rename(p_n = presc_anthyroid_meds) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_4 <- cbind(name, df_patient_gender) # 改数
+```
+## 5. "sick"  
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(sick) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(sick) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(sick) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(sick) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(sick) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "sick")  %>% 
+  rename(p_n = sick) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_5 <- cbind(name, df_patient_gender) # 改数
+```
+## 6. "pregnant"  
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(pregnant) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(pregnant) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(pregnant) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(pregnant) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(pregnant) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "pregnant")  %>% 
+  rename(p_n = pregnant) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_6 <- cbind(name, df_patient_gender) # 改数
+```
+## 7. "thyroid_surgery"   
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(thyroid_surgery) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(thyroid_surgery) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(thyroid_surgery) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(thyroid_surgery) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(thyroid_surgery) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "thyroid_surgery")  %>% 
+  rename(p_n = thyroid_surgery) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_7 <- cbind(name, df_patient_gender) # 改数
+```
+## 8. "radioactive_iodine_therapyI131"
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(radioactive_iodine_therapyI131) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(radioactive_iodine_therapyI131) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(radioactive_iodine_therapyI131) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(radioactive_iodine_therapyI131) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(radioactive_iodine_therapyI131) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "radioactive_iodine_therapyI131")  %>% 
+  rename(p_n = radioactive_iodine_therapyI131) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_8 <- cbind(name, df_patient_gender) # 改数
+```
+## 9. "query_hypothyroid"   
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(query_hypothyroid) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(query_hypothyroid) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(query_hypothyroid) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(query_hypothyroid) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(query_hypothyroid) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "query_hypothyroid")  %>% 
+  rename(p_n = query_hypothyroid) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_9 <- cbind(name, df_patient_gender) # 改数
+```
+## 10. "query_hyperthyroid"  
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(query_hyperthyroid) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(query_hyperthyroid) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(query_hyperthyroid) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(query_hyperthyroid) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(query_hyperthyroid) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "query_hyperthyroid")  %>% 
+  rename(p_n = query_hyperthyroid) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_10 <- cbind(name, df_patient_gender) # 改数
+```
+## 11. "lithium"  
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(lithium) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(lithium) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(lithium) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(lithium) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(lithium) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "lithium")  %>% 
+  rename(p_n = lithium) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_11 <- cbind(name, df_patient_gender) # 改数
+```
+## 12. "goitre"
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(goitre) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(goitre) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(goitre) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(goitre) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(goitre) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "goitre")  %>% 
+  rename(p_n = goitre) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_12 <- cbind(name, df_patient_gender) # 改数
+```
+## 13. "tumor"  
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(tumor) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(tumor) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(tumor) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(tumor) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(tumor) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "tumor")  %>% 
+  rename(p_n = tumor) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_13 <- cbind(name, df_patient_gender) # 改数
+```
+## 14. "hypopituitarism" 
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(hypopituitarism) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(hypopituitarism) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(hypopituitarism) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(hypopituitarism) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(hypopituitarism) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "hypopituitarism")  %>% 
+  rename(p_n = hypopituitarism) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_14 <- cbind(name, df_patient_gender) # 改数
+```
+## 15. "psych_condition"   
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(psych_condition) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(psych_condition) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(psych_condition) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(psych_condition) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(psych_condition) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "psych_condition")  %>% 
+  rename(p_n = psych_condition) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_15 <- cbind(name, df_patient_gender) # 改数
+```
+## 16. "TSH_measured" 
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(TSH_measured) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(TSH_measured) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(TSH_measured) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(TSH_measured) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(TSH_measured) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "TSH_measured")  %>% 
+  rename(p_n = TSH_measured) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_16 <- cbind(name, df_patient_gender) # 改数
+```
+## 17. "T3_measured"  
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(T3_measured) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(T3_measured) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(T3_measured) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(T3_measured) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(T3_measured) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "T3_measured")  %>% 
+  rename(p_n = T3_measured) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_17 <- cbind(name, df_patient_gender) # 改数
+```
+## 18. "T4_measured" 
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(T4_measured) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(T4_measured) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(T4_measured) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(T4_measured) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(T4_measured) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "T4_measured")  %>% 
+  rename(p_n = T4_measured) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_18 <- cbind(name, df_patient_gender) # 改数
+```
+## 19. "thyrox_util_rate_T4U_measured" 
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(thyrox_util_rate_T4U_measured) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(thyrox_util_rate_T4U_measured) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(thyrox_util_rate_T4U_measured) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(thyrox_util_rate_T4U_measured) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(thyrox_util_rate_T4U_measured) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "thyrox_util_rate_T4U_measured") %>% 
+  rename(p_n = thyrox_util_rate_T4U_measured) # 改名
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_19 <- cbind(name, df_patient_gender) # 改数
+```
+## 20. "FTI_measured"
+```{r}
+data_T3_reading_fill <- data_sick %>% 
+  group_by(FTI_measured) %>% 
+  summarise(standard = sd(T3_reading_fill),
+            mean = mean(T3_reading_fill), 
+            median = median(T3_reading_fill))
+
+
+data_T4_reading_fill <- data_sick %>% 
+  group_by(FTI_measured) %>% 
+  summarise(standard = sd(T4_reading_fill), # count = n(),
+            mean = mean(T4_reading_fill), 
+            median = median(T4_reading_fill))
+
+data_TSH_reading_fill <- data_sick %>% 
+  group_by(FTI_measured) %>% 
+  summarise(standard = sd(TSH_reading_fill),
+            mean = mean(TSH_reading_fill), 
+            median = median(TSH_reading_fill))
+  
+data_FTI_reading_fill <- data_sick %>% 
+  group_by(FTI_measured) %>% 
+  summarise(standard = sd(FTI_reading_fill),
+            mean = mean(FTI_reading_fill), 
+            median = median(FTI_reading_fill))
+  
+data_T4U_rate_reading_fill <- data_sick %>% 
+  group_by(FTI_measured) %>% 
+  summarise(standard = sd(T4U_rate_reading_fill),
+            mean = mean(T4U_rate_reading_fill), 
+            median = median(T4U_rate_reading_fill))
+
+patient_gender <- rbind(data_T3_reading_fill,
+           data_T4_reading_fill,
+           data_TSH_reading_fill,
+           data_FTI_reading_fill, 
+           data_T4U_rate_reading_fill)
+
+df_patient_gender <- patient_gender %>% 
+  mutate(indicateur = "FTI_measured") %>% 
+  rename(p_n = FTI_measured)
+
+# 加名字
+name <- c("T3_reading", "T3_reading",
+        "T4_reading", "T4_reading",
+        "TSH_reading", "TSH_reading",
+        "FTI_reading", "FTI_reading",
+        "T4U_rate_reading", "T4U_rate_reading")
+
+df_20 <- cbind(name, df_patient_gender) # 改数
+```
+
+
+```{r}
+df_sum <- rbind(df_1, df_2, df_3, df_4, df_5,
+                df_6, df_7, df_8, df_9, df_10,
+           df_11, df_12, df_13, df_14, df_15,
+           df_16, df_17, df_18, df_19, df_20)
+
+AddRow=c(NA, 
+         nrow(df_sum)+1, 
+         df_sum[1,(ncol(df_sum)-3):ncol(df_sum)])
+data2 <- rbind(df_sum, as.numeric(AddRow))
+```
+
+```{r}
+
+df_sum %>% write.csv(file = "../../A_Datas/df_tidy_for_db3.csv", row.names=F)
+```

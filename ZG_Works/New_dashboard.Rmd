@@ -14,11 +14,7 @@ library(flexdashboard)
 library(shiny)
 library(readr)
 
-data <- read.csv("../A_Datas/age_3.csv",encoding = 'UTF-8')
-
-
 data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
-
 data2 <- read.csv("../A_Datas/df_tidy_for_db3.csv")
 ```
 
@@ -45,14 +41,31 @@ selectInput('ycol', 'Y Variable', colnames(data1)[25:29],
 selectInput('var', 'Variable', c(colnames(data1)[2:24],colnames(data1)[30]),
                 selected=colnames(data1)[[5]])
 
-# Définir la barre latérale (onglets)
-selectInput('data', 'data_name', type,
-            selected=type[[1]])
+p("=============================")
+p("Patient group comparison")
+p("=============================")
+selectInput('data', 'Different patient groups', 
+            list("whether thyroxine replacement prescribed" = "presc_thyroxine",
+                 "Patient Gender" = "patient_gender",
+                 "query has been actioned" = "queried_why_on_thyroxine", 
+                 "sickness due to thyroxine depletion or over activity" = "sick", 
+                 "whether patient has had radioactive iodine treatment" = "radioactive_iodine_therapyI131", 
+                 "under active thyroid query" = "query_hypothyroid", 
+                 "over active thyroid query" = "query_hyperthyroid", 
+                 "Lithium carbonate administered to decrease the level of thyroid hormones" = "lithium", 
+                 "swelling of the thyroid gland" = "goitre", 
+                 "Have a tumor" = "tumor", 
+                 "a diagnosed under active thyroid" = "hypopituitarism", 
+                 "whether a patient has a psychological condition" = "psych_condition", 
+                 "A TSH level lower than normal" = "TSH_measured", 
+                 "free triiodothyronine rise above normal" = "T3_measured", 
+                 "the thyroxine utilisation rate" = "thyrox_util_rate_T4U_measured", 
+                 "measurement on the Free Thyroxine Index" = "FTI_measured"))
 
 selectInput("variable",  # 传入变量名称
-            "gender：", # 提示文字
-            list("male" = "0",
-                 "female" = "1"))
+            "Yes or No (Gender: M/ F)", # 提示文字
+            list("Yes" = "1",
+                 "No" = "0"))
     
 # varSelectInput("variable", "Variable:", data)
 ```
@@ -82,9 +95,9 @@ renderPlot({
 ```
 
 
-Column {.tabset .tabset-fade}
+Column {data-width=500}
 -----------------------------------------------------------------------
-### Male
+### Comparison of indicators in different patient groups
 ```{r}
 renderPlot({
   data2 <- data2 %>% 
@@ -113,93 +126,10 @@ data2 %>%
   theme_light()+
   theme(axis.text.x=element_text(size = 8,colour="black"))+
     labs(
-    title = "Comparison of male indicators",
-    subtitle = " ",
+    title = " ",
+    # subtitle = " ",
     caption = "Data source: Aymeric Stamm"  )
 })
 ```
 
-### Female
-
-```{r, fig.height=10}
-renderTable({
-data4 <- data %>% 
-  filter(patient_gender != input$variable) %>% # input$variable
-  select(-(patient_gender)) %>% 
-  mutate(id = c(1:6))})
-
-renderPlot({
-  ggplot(data=data4, aes(x=id)) +
-  geom_polygon(aes(y=standard),color = "black", fill= "#ffd200",alpha=0.1)+
-  geom_point(aes(y=standard, fill= "#ffd200"),size=5,shape=21,color = 'black',fill= "#ffd200")+
-  
-  geom_polygon(aes(y=mean),color = "black", fill= "#304156",alpha=0.1)+
-  geom_point(aes(y=mean, fill= "#304156"),size=5,shape=21,color = 'black', fill= "#304156")+
-  
-  geom_polygon(aes(y=median),color = "black", fill= "#f8766d",alpha=0.1)+
-  geom_point(aes(y=median, fill= "#f8766d"),size=5,shape=21,color = 'black', fill= "#f8766d")+
-  
-  coord_polar() +
-  scale_x_continuous(breaks =data4$id,labels=data4$name)+
-  theme_light()+
-  theme(axis.text.x=element_text(size = 8,colour="black"))+
-    labs(
-    title = "Comparison of female indicators",
-    subtitle = " ",
-    caption = "Data source: Aymeric Stamm"  )
-})
-```
-
-
-### Male
-```{r}
-renderTable({
-data2 <- data2 %>% 
-    filter(indicateur == 'patient_gender') %>% 
-    filter(p_n == input$variable) %>% 
-    select(-c(p_n, indicateur))
-
-AddRow=c(NA, 
-         nrow(data2)+1, 
-         data2[1,(ncol(data2)-1):ncol(data2)])
-data2 <- rbind(data2, as.numeric(AddRow))
-
-data2 <- data2 %>% 
-  mutate(id = c(1:6))
-})
-
-renderPlot({
-  data2 <- data2 %>% 
-    filter(indicateur == 'patient_gender') %>% 
-    filter(p_n != 0) %>% 
-    select(-c(p_n, indicateur))
-
-AddRow=c(NA, 
-         nrow(data2)+1, 
-         data2[1,(ncol(data2)-1):ncol(data2)])
-data2 <- rbind(data2, as.numeric(AddRow))
-
-data2 <- data2 %>% 
-  mutate(id = c(1:6))
-
-ggplot(data=data2, aes(x=id)) +
-  geom_polygon(aes(y=standard),color = "black", fill= "#ffd200",alpha=0.1)+
-  geom_point(aes(y=standard, fill= "#ffd200"),size=5,shape=21,color = 'black',fill= "#ffd200")+
-  
-  geom_polygon(aes(y=mean),color = "black", fill= "#304156",alpha=0.1)+
-  geom_point(aes(y=mean, fill= "#304156"),size=5,shape=21,color = 'black', fill= "#304156")+
-  
-  geom_polygon(aes(y=median),color = "black", fill= "#f8766d",alpha=0.1)+
-  geom_point(aes(y=median, fill= "#f8766d"),size=5,shape=21,color = 'black', fill= "#f8766d")+
-  
-  coord_polar() +
-  scale_x_continuous(breaks =data2$id,labels=data2$name)+
-  theme_light()+
-  theme(axis.text.x=element_text(size = 8,colour="black"))+
-    labs(
-    title = "Comparison of male indicators",
-    subtitle = " ",
-    caption = "Data source: Aymeric Stamm"  )
-})
-```
 
