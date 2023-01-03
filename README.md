@@ -1,9 +1,9 @@
 # :construction: Todo
 - [ ] Create a dashboard with tabs: 
   - [ ] Organize Rmarkdown **[Not collated]**
-    - [ ] one for a recap of numbers of individual patients (allowing the user to choose the patient);
+    - [x] one for a recap of numbers of individual patients (allowing the user to choose the patient);
     - [ ] one with intuitive viz or data table summaries of individual variables (possibly by subgroups);
-    - [ ] one for comparing groups of patients (allowing the user to choose the variable(s) by which grouping the data).
+    - [x] one for comparing groups of patients (allowing the user to choose the variable(s) by which grouping the data).
 - [ ] Separately generate a HTML report providing insight into which variables might be the best preditors of thyroid disease.
   - [ ] Organize Rmarkdown **[Not collated]**
     - [x] Completed heat map showing correlation
@@ -16,12 +16,16 @@
 - [ ] 2022_Project.html **Requirements**
 
 - [ ] :tada:[A_Datas] **Data**
-  - [ ] thyroid.csv **Data**
+  - [x] thyroid.csv **Data**
   - [x] thyroid_tidy.csv **Data**
+  - [x] df_tidy_for_db3.csv **Data for DB3**
 - [ ] [A_Dashboard] **Exemple de tableau de bord**
 
 - [ ] :construction:Code
   - [x] 1_Preparation.Rmd: Population de données + exploration de la pertinence
   - [ ] 2_Dashboard_temp[work here!!!].Rmd: Zone d'édition du tableau de bord
-  
+    - [x] DB1:  RT_Works/test2.Rmd
+    - [ ] DB2    
+    - [x] DB3:  ZG_Works/New_dashboard.Rmd 
+    
  - [ ] :construction:Dossiers personnels
