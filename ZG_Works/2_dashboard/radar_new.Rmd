@@ -17,25 +17,11 @@ data1 <- read.csv("../../A_Datas/df_tidy_for_db3.csv",encoding = 'UTF-8')
 head(data1)
 ```
 # Traitement des données
-```{r}
-data2 <- data1 %>% 
-  filter(indicateur == 'presc_anthyroid_meds') %>% 
-  filter(p_n != 0) %>% 
-  select(-c(p_n, indicateur))
-
-AddRow=c(NA, 
-         nrow(data2)+1, 
-         data2[1,(ncol(data2)-1):ncol(data2)])
-data2 <- rbind(data2, as.numeric(AddRow))
-data2 %>% 
-  mutate(id = c(1:6))
-```
-
 
 ```{r}
 data2 <- data1 %>% 
-  filter(indicateur == 'presc_an', p_n == 0) %>% 
-  select(-c(p_n, indicateur))
+    filter(indicateur == 'patient_gender', p_n == 0) %>% 
+    select(-c(p_n, indicateur))
 
 AddRow=c(NA, 
          nrow(data2)+1, 
@@ -44,8 +30,8 @@ data2 <- rbind(data2, as.numeric(AddRow))
 
 data2 <- data2 %>% 
   mutate(id = c(1:6))
-
-ggplot(data=data2, aes(x=id)) +
+data2  %>%
+  ggplot(aes(x=id)) +
   geom_polygon(aes(y=standard),color = "black", fill= "#ffd200",alpha=0.1)+
   geom_point(aes(y=standard, fill= "#ffd200"),size=5,shape=21,color = 'black',fill= "#ffd200")+
   
@@ -56,11 +42,11 @@ ggplot(data=data2, aes(x=id)) +
   geom_point(aes(y=median, fill= "#f8766d"),size=5,shape=21,color = 'black', fill= "#f8766d")+
   
   coord_polar() +
-  scale_x_continuous(breaks =data2$id,labels=data2$name)+
+  scale_x_continuous(breaks = data2$id,labels=data2$name)+
   theme_light()+
   theme(axis.text.x=element_text(size = 8,colour="black"))+
     labs(
-    title = "Comparison of female indicators",
-    subtitle = " ",
+    title = " ",
+    # subtitle = " ",
     caption = "Data source: Aymeric Stamm"  )
 ```
