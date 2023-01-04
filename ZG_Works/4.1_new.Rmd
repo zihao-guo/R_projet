@@ -1,0 +1,139 @@
+---
+title: "Vis"
+author: "ZG"
+date: "2023-01-04"
+output: html_document
+---
+```{r setup}
+library(tidyverse)
+library(readr)
+
+library(ggplot2)
+```
+
+# 1.Importation des données
+```{r}
+data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+head(data1)
+
+
+
+```
+```{r}
+data_age_pre <- data1 %>% 
+  group_by(patient_age_Seg, presc_thyroxine) %>% 
+  summarise(count = n(),
+            .groups = "drop_last")
+data_age_pre$presc_thyroxine[data_age_pre$presc_thyroxine== 0 ]<-"NO"
+data_age_pre$presc_thyroxine[data_age_pre$presc_thyroxine== 1 ]<-"YES"
+```
+
+```{r}
+ggplot(data=data_age_pre,
+       mapping=aes(x=patient_age_Seg,y=count))+
+  geom_point(aes(size=count, colour=presc_thyroxine),alpha=1/3 )
+```
+```{r}
+df_1 <- data1 %>% 
+  group_by(patient_age_Seg, presc_thyroxine) %>% 
+  summarise(count = n(),
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "presc_thyroxine") %>% 
+  rename(p_n = presc_thyroxine)
+
+df_1$p_n[df_1$p_n== 0 ]<-"NO"
+df_1$p_n[df_1$p_n== 1 ]<-"YES"
+
+df_1 %>% 
+  ggplot(aes(x = patient_age_Seg, y = count)) +
+  geom_col(aes(colour=p_n, fill=p_n), position = "dodge") +
+  facet_grid(~ indicateur)
+```
+
+```{r}
+df_2 <- data1 %>% 
+  group_by(patient_age_Seg, tumor) %>% 
+  summarise(count = n(),
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "tumor") %>% 
+  rename(p_n = tumor)
+
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+
+df <- rbind(df_1, df_2)
+df %>% 
+  ggplot(aes(x = patient_age_Seg, y = count)) +
+  geom_col(aes(colour=p_n, fill=p_n), position = "dodge") +
+  facet_grid(~ indicateur)
+```
+
+```{r}
+df_2 <- data1 %>% 
+  group_by(ThyroidClass, patient_gender, tumor) %>% 
+  summarise(count = n(),
+            .groups = "drop_last") %>% 
+  rename(p_n = 'tumor') %>% 
+  rename(indic = 'patient_gender')
+
+df_2$indic[df_2$indic== 0 ]<-"NO"
+df_2$indic[df_2$indic== 1 ]<-"YES"
+
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes(x = ThyroidClass, y = count)) +
+  geom_col(aes(colour=ThyroidClass, fill=ThyroidClass), position = "dodge")+
+  facet_grid( ~ indic)
+```
+
+
+## facet_grid
+```{r}
+df_2 <- data1 %>% 
+  rename(p_n = 'pregnant')
+
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes(x = T3_reading_fill, y = T4U_rate_reading_fill)) +
+  geom_point(aes(colour=p_n))+
+  facet_grid(p_n ~ ThyroidClass)
+```
+```{r}
+df_2 <- data1 %>% 
+  group_by(ThyroidClass, patient_gender, tumor) %>% 
+  summarise(count = n(),
+            .groups = "drop_last") %>% 
+  rename(p_n = 'tumor') %>% 
+  rename(indic = 'patient_gender')
+
+df_2$indic[df_2$indic== 0 ]<-"NO"
+df_2$indic[df_2$indic== 1 ]<-"YES"
+
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes(x = indic, y = count)) +
+  geom_col(aes(colour=p_n, fill=p_n), position = "dodge")+
+  facet_grid(p_n ~ ThyroidClass)
+```
+
+##所有变量[暂时未做]
+```{r}
+bin_var <- c("patient_gender", "presc_thyroxine", "queried_why_on_thyroxine", "presc_anthyroid_meds", "sick", "pregnant", "thyroid_surgery", "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", 
+"psych_condition", "TSH_measured", "T3_measured", "T4_measured", "thyrox_util_rate_T4U_measured", "FTI_measured")
+```
+
+```{r}
+data1 %>% 
+  group_by(patient_gender, presc_thyroxine, queried_why_on_thyroxine, presc_anthyroid_meds, sick, pregnant, thyroid_surgery, radioactive_iodine_therapyI131, query_hypothyroid, query_hyperthyroid, lithium, goitre, tumor, hypopituitarism, 
+psych_condition, TSH_measured, T3_measured, T4_measured, thyrox_util_rate_T4U_measured, FTI_measured) %>% 
+  summarise(count = n(),
+            .groups = "drop_last") %>% 
+  head()
+```
+

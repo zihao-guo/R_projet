@@ -1,0 +1,143 @@
+---
+title: "Patient group comparison"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(flexdashboard)
+library(shiny)
+library(readr)
+
+library(ggplot2)
+
+data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+```
+
+
+Input {.sidebar}
+-----------------------------------------------------------
+
+
+```{r}
+type <- c("patient_gender", "presc_thyroxine", "queried_why_on_thyroxine", 
+          #"presc_anthyroid_meds", 
+          "sick", 
+          #"pregnant", "thyroid_surgery", 
+          "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", 
+          # "T4_measured", 
+          "thyrox_util_rate_T4U_measured", "FTI_measured")
+
+selectInput('xcol', 'X Variable', 
+            list(
+              "T3" = "T3_reading_fill",       
+              "T4" = "T4_reading_fill",     
+              "TSH" = "TSH_reading_fill",     
+              "FTI" = "FTI_reading_fill",    
+              "T4U" = "T4U_rate_reading_fill"))
+
+
+selectInput('ycol', 'Y Variable',             
+            list(
+              "T4" = "T4_reading_fill",
+              "T3" = "T3_reading_fill",       
+              "TSH" = "TSH_reading_fill",     
+              "FTI" = "FTI_reading_fill",    
+              "T4U" = "T4U_rate_reading_fill"))
+
+selectInput('var', 'Variable', c(colnames(data1)[2:24],colnames(data1)[30]),
+                selected=colnames(data1)[[5]])
+
+selectInput('var2', 'Influencing Factors',
+            list("whether thyroxine replacement prescribed" = "presc_thyroxine",
+                 "Patient Gender" = "patient_gender",
+                 "query has been actioned" = "queried_why_on_thyroxine", 
+                 "sickness due to thyroxine depletion or over activity" = "sick", 
+                 "whether patient has had radioactive iodine treatment" = "radioactive_iodine_therapyI131", 
+                 "under active thyroid query" = "query_hypothyroid", 
+                 "over active thyroid query" = "query_hyperthyroid", 
+                 "Lithium carbonate administered to decrease the level of thyroid hormones" = "lithium", 
+                 "swelling of the thyroid gland" = "goitre", 
+                 "Have a tumor" = "tumor", 
+                 "a diagnosed under active thyroid" = "hypopituitarism", 
+                 "whether a patient has a psychological condition" = "psych_condition", 
+                 "A TSH level lower than normal" = "TSH_measured", 
+                 "free triiodothyronine rise above normal" = "T3_measured", 
+                 "the thyroxine utilisation rate" = "thyrox_util_rate_T4U_measured", 
+                 "measurement on the Free Thyroxine Index" = "FTI_measured"))
+
+selectInput('var', 'Influencing Factors',
+            list("whether thyroxine replacement prescribed" = "presc_thyroxine",
+                 "Patient Gender" = "patient_gender",
+                 "query has been actioned" = "queried_why_on_thyroxine", 
+                 "sickness due to thyroxine depletion or over activity" = "sick", 
+                 "whether patient has had radioactive iodine treatment" = "radioactive_iodine_therapyI131", 
+                 "under active thyroid query" = "query_hypothyroid", 
+                 "over active thyroid query" = "query_hyperthyroid", 
+                 "Lithium carbonate administered to decrease the level of thyroid hormones" = "lithium", 
+                 "swelling of the thyroid gland" = "goitre", 
+                 "Have a tumor" = "tumor", 
+                 "a diagnosed under active thyroid" = "hypopituitarism", 
+                 "whether a patient has a psychological condition" = "psych_condition", 
+                 "A TSH level lower than normal" = "TSH_measured", 
+                 "free triiodothyronine rise above normal" = "T3_measured", 
+                 "the thyroxine utilisation rate" = "thyrox_util_rate_T4U_measured", 
+                 "measurement on the Free Thyroxine Index" = "FTI_measured"))
+    
+# varSelectInput("variable", "Variable:", data)
+```
+
+Column {data-width=600}
+-----------------------------------------------------------------------
+### Numerical variable comparison
+
+```{r}
+
+renderPlot({
+df_2 <- data1 %>% 
+  rename(p_n = input$var)
+
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes_string(x = input$xcol, y = input$ycol)) +
+  geom_point(aes(colour=p_n))+
+  facet_grid(p_n ~ ThyroidClass) + labs(
+    x = as.character(input$xcol),
+    y = as.character(input$ycol),
+    # title = "Numerical variable comparison",
+    subtitle = " ",
+    caption = "Data source: Aymeric Stamm"  )
+})
+
+```
+
+### bar
+```{r}
+renderPlot({
+  df_2 <- data1 %>% 
+  group_by(ThyroidClass, input$var, input$var2) %>% 
+  summarise(count = n(),
+            .groups = "drop_last") %>% 
+  rename(p_n = input$var) %>% 
+  rename(indic = input$var2)
+
+df_2$indic[df_2$indic== 0 ]<-"NO"
+df_2$indic[df_2$indic== 1 ]<-"YES"
+
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes_string(x = ThyroidClass, y = count)) +
+  geom_col(aes(colour=ThyroidClass, fill=ThyroidClass), position = "dodge")+
+  facet_grid( ~ indic)
+})
+```
+

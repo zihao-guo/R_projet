@@ -14,6 +14,8 @@ library(flexdashboard)
 library(shiny)
 library(readr)
 
+library(ggplot2)
+
 data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
 data2 <- read.csv("../A_Datas/df_tidy_for_db3.csv")
 ```
@@ -32,19 +34,23 @@ type <- c("patient_gender", "presc_thyroxine", "queried_why_on_thyroxine",
           # "T4_measured", 
           "thyrox_util_rate_T4U_measured", "FTI_measured")
 
-selectInput('xcol', 'X Variable', colnames(data1)[25:29],
-                selected=colnames(data1)[[25]])
+selectInput('xcol', 'X Variable', 
+            list(
+              "The reading result of the Free triiodothyronine" = "T3_reading_fill",       
+              "The reading result of the Free thyroxine" = "T4_reading_fill",     
+              "The reading result of the TSH blood test" = "TSH_reading_fill",     
+              "The result of the Free Thyroxine Index" = "FTI_reading_fill",    
+              "The result of the thyroxine utilisation rate" = "T4U_rate_reading_fill"))
 
-selectInput('ycol', 'Y Variable', colnames(data1)[25:29],
-                selected=colnames(data1)[[26]])
+selectInput('ycol', 'Y Variable',             
+            list(
+              "The reading result of the Free thyroxine" = "T4_reading_fill",  
+              "The reading result of the Free triiodothyronine" = "T3_reading_fill",       
+              "The reading result of the TSH blood test" = "TSH_reading_fill",     
+              "The result of the Free Thyroxine Index" = "FTI_reading_fill",    
+              "The result of the thyroxine utilisation rate" = "T4U_rate_reading_fill"))
 
-selectInput('var', 'Variable', c(colnames(data1)[2:24],colnames(data1)[30]),
-                selected=colnames(data1)[[5]])
-
-p("=============================")
-p("Patient group comparison")
-p("=============================")
-selectInput('data', 'Different patient groups', 
+selectInput('var', 'Influencing Factors',
             list("whether thyroxine replacement prescribed" = "presc_thyroxine",
                  "Patient Gender" = "patient_gender",
                  "query has been actioned" = "queried_why_on_thyroxine", 
@@ -61,6 +67,12 @@ selectInput('data', 'Different patient groups',
                  "free triiodothyronine rise above normal" = "T3_measured", 
                  "the thyroxine utilisation rate" = "thyrox_util_rate_T4U_measured", 
                  "measurement on the Free Thyroxine Index" = "FTI_measured"))
+# c(colnames(data1)[2:24],colnames(data1)[30]),
+                # selected=colnames(data1)[[5]])
+
+p("=============================")
+p("Patient group comparison")
+p("=============================")
 
 selectInput("variable",  # 传入变量名称
             "Yes or No (Gender: F/ M)", # 提示文字
@@ -70,127 +82,124 @@ selectInput("variable",  # 传入变量名称
 # varSelectInput("variable", "Variable:", data)
 ```
 
-Column {data-width=600}
+Column {data-width=400}
 -----------------------------------------------------------------------
-
 ### Numerical variable comparison
 
 ```{r, fig.height=10}
-data1_2 <- data1 %>% 
-  filter(ThyroidClass == "sick")
 
 renderPlot({
-  ggplot(data = data1_2, 
-         mapping = aes_string(x = input$xcol,
-                       y = input$ycol,
-                       color = input$var)) + 
-  geom_point() +
-    labs(
+df_2 <- data1 %>% 
+  rename(p_n = input$var)
+
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes_string(x = input$xcol, y = input$ycol)) +
+  geom_point(aes(colour=p_n))+
+  facet_grid(p_n ~ ThyroidClass) + labs(
     x = as.character(input$xcol),
     y = as.character(input$ycol),
     # title = "Numerical variable comparison",
     subtitle = " ",
     caption = "Data source: Aymeric Stamm"  )
 })
+
 ```
+
+
 
 ### Indicator board
 ```{r}
 renderText({
-  if ((input$data == 'presc_thyroxine') & (input$variable==1))
+  if ((input$var == 'presc_thyroxine') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Prescribed thyroxine replacement! ')}
-  else if((input$data == 'presc_thyroxine') & (input$variable==0))
+  else if((input$var == 'presc_thyroxine') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ Thyroxine replacement not prescribed! ')}
   
-  else if((input$data == 'patient_gender') & (input$variable==1))
+  else if((input$var == 'patient_gender') & (input$variable==1))
   {print('ฅ՞•ﻌ•՞ฅ Female patient group presentation! ')}
-  else if((input$data == 'patient_gender') & (input$variable==0))
+  else if((input$var == 'patient_gender') & (input$variable==0))
   {print('◔.̮◔✧ Male patient group presentation! ')}
   
-  else if((input$data == 'queried_why_on_thyroxine') & (input$variable==1))
+  else if((input$var == 'queried_why_on_thyroxine') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Queried Executed Operations! ')}
-  else if((input$data == 'queried_why_on_thyroxine') & (input$variable==0))
+  else if((input$var == 'queried_why_on_thyroxine') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ Not Querying Executed Operations! ')}
   
-  else if((input$data == 'sick') & (input$variable==1))
+  else if((input$var == 'sick') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Have a disease caused by thyroxine depletion or over-activity! ')}
-  else if((input$data == 'sick') & (input$variable==0))
+  else if((input$var == 'sick') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ No illness due to thyroxine depletion or over activity! ')}
   
-  else if((input$data == 'radioactive_iodine_therapyI131') & (input$variable==1))
+  else if((input$var == 'radioactive_iodine_therapyI131') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Patient has received radioactive iodine treatment! ')}
-  else if((input$data == 'radioactive_iodine_therapyI131') & (input$variable==0))
+  else if((input$var == 'radioactive_iodine_therapyI131') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ Patient has not been treated with radioactive iodine! ')}
   
-  else if((input$data == 'lithium') & (input$variable==1))
+  else if((input$var == 'lithium') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Patients are given lithium carbonate to lower thyroid hormone levels! ')}
-  else if((input$data == 'lithium') & (input$variable==0))
+  else if((input$var == 'lithium') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ Patient not given lithium carbonate to lower thyroid hormone levels! ')}
   
-  else if((input$data == 'goitre') & (input$variable==1))
+  else if((input$var == 'goitre') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Swelling of the thyroid gland! ')}
-  else if((input$data == 'goitre') & (input$variable==0))
+  else if((input$var == 'goitre') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ No swelling of the thyroid gland! ')}
   
-  else if((input$data == 'tumor') & (input$variable==1))
+  else if((input$var == 'tumor') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Patient has a tumor! ')}
-  else if((input$data == 'tumor') & (input$variable==0))
+  else if((input$var == 'tumor') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ Patient does not have a tumor! ')}
   
-  else if((input$data == 'hypopituitarism') & (input$variable==1))
+  else if((input$var == 'hypopituitarism') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Patient diagnosed under thyroid activity! ')}
-  else if((input$data == 'hypopituitarism') & (input$variable==0))
+  else if((input$var == 'hypopituitarism') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ Patients are not diagnosed under thyroid activity! ')}
   
-  else if((input$data == 'psych_condition') & (input$variable==1))
+  else if((input$var == 'psych_condition') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Patients with psychological conditions! ')}
-  else if((input$data == 'psych_condition') & (input$variable==0))
+  else if((input$var == 'psych_condition') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ The patient has no psychological condition! ')}
   
-  else if((input$data == 'TSH_measured') & (input$variable==1))
+  else if((input$var == 'TSH_measured') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Patient with hyperthyroidism! ')}
-  else if((input$data == 'TSH_measured') & (input$variable==0))
+  else if((input$var == 'TSH_measured') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ Patient does not have hyperthyroidism! ')}
   
-  else if((input$data == 'T3_measured') & (input$variable==1))
+  else if((input$var == 'T3_measured') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Patient with hyperthyroidism! ')}
-  else if((input$data == 'T3_measured') & (input$variable==0))
+  else if((input$var == 'T3_measured') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ Patient does not have hyperthyroidism! ')}
   
-  else if((input$data == 'thyrox_util_rate_T4U_measured') & (input$variable==1))
+  else if((input$var == 'thyrox_util_rate_T4U_measured') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Patient with hyperthyroidism! ')}
-  else if((input$data == 'thyrox_util_rate_T4U_measured') & (input$variable==0))
+  else if((input$var == 'thyrox_util_rate_T4U_measured') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ Patient does not have hyperthyroidism! ')}
   
-  else if((input$data == 'FTI_measured') & (input$variable==1))
+  else if((input$var == 'FTI_measured') & (input$variable==1))
     {print(',,Ծ‸Ծ,, Patient with hyperthyroidism! ')}
-  else if((input$data == 'FTI_measured') & (input$variable==0))
+  else if((input$var == 'FTI_measured') & (input$variable==0))
   {print('ฅ՞•ﻌ•՞ฅ Patient does not have hyperthyroidism! ')}
+  
   })
 ```
 Column {data-width=500}
 -----------------------------------------------------------------------
 
-### Comparison group data table
-```{r}
-renderTable({
-data2 %>% 
-    filter(p_n == input$variable, indicateur == input$data) %>% 
-    select(-c(p_n, indicateur))
-})
-```
-
 ### Comparison of indicators in different patient groups
 ```{r}
 renderPlot({
   data2 <- data2 %>% 
-    filter(p_n == input$variable, indicateur == input$data) %>% 
+    filter(p_n == input$variable, indicateur == input$var) %>% 
     select(-c(p_n, indicateur))
 
 AddRow=c(NA, 
          nrow(data2)+1, 
          data2[1,(ncol(data2)-1):ncol(data2)])
 data2 <- rbind(data2, as.numeric(AddRow))
+
 
 data2 <- data2 %>% 
   mutate(id = c(1:6))
@@ -208,12 +217,15 @@ data2  %>%
   coord_polar() +
   scale_x_continuous(breaks =data2$id,labels=data2$name)+
   theme_light()+
-  theme(axis.text.x=element_text(size = 7.2,colour="black"))+
+  theme(axis.text.x=element_text(size = 15,colour="black"))+
     labs(
     # title = " ",
-    subtitle = "Tips: Red: Mediam, Yellow: Standard, Gray: Mean",
-    caption = "Data source: Aymeric Stamm"  )
+    subtitle =  "Tips: Red: Mediam, Yellow: Standard, Gray: Mean" ,
+    caption = "T3: The reading result of the Free triiodothyronine | T4: The reading result of the Free thyroxine, \nTSH: The result of the TSH blood test | FTI:The result of the Free Thyroxine Index | T4U: The result of the thyroxine utilisation rate" )
+
+
+
+
 })
 ```
-
 

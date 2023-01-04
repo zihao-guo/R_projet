@@ -12,7 +12,7 @@ library(readr)
 
 # 1. Importation des données
 ```{r}
-data1 <- read.csv("../../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
 head(data1)
 ```
 ```{r}
@@ -1073,8 +1073,13 @@ df_sum <- rbind(df_1, df_2, df_3, df_4, df_5,
 ```
 
 ```{r}
+df_sum$name[df_sum$name== "T4_reading" ]<-"T4"
+df_sum$name[df_sum$name== "T3_reading" ]<-"T3"
+df_sum$name[df_sum$name== "TSH_reading" ]<-"TSH"
+df_sum$name[df_sum$name== "FTI_reading" ]<-"FTI"
+df_sum$name[df_sum$name== "T4U_rate_reading" ]<-"T4U"
 
-df_sum %>% write.csv(file = "../../A_Datas/df_tidy_for_db3.csv", row.names=F)
+df_sum %>% write.csv(file = "../A_Datas/df_tidy_for_db3.csv", row.names=F)
 ```
 
 # 3. Visualisation des données
