@@ -128,11 +128,41 @@ Notre dashboard est constitué de trois pages :
 
 # Analyse des données
 
+Lors d'une maladie de la thyroïde, de nombreux symptômes peuvent apparaître. Dans le cas d'une hyperthyroïde (excès d'hormones thyroïdiennes), on observe chez le patient une anxiété, une irritabilité, une perte de poids, et des problèmes de visions. En cas d'hypothyroïde (manque d'hormones thyroîdiennes), on observe chez le patient une sensation de fatigue, une prise de poids, une voix rauque, et une sensibilité accrue au froid. La première étape pour détecter une potentielle maladie de la thyroïde serait donc d'observer ces symptômes.
+
+```{r, include = FALSE}
+n_thyroid <-  nrow(thyroid %>% 
+  filter(ThyroidClass == "sick"))
+
+n_health <- nrow(thyroid %>% 
+                   filter(ThyroidClass == "negative"))
+
+pop <- c(n_health, n_thyroid)
+
+
+prop1 <- thyroid %>% 
+  group_by(ThyroidClass) %>% 
+  summarize(n_sick = sum(sick)) %>% 
+  mutate(population = pop) %>% 
+  mutate(proportion = n_sick/population)
+```
+
+```{r, echo = FALSE}
+prop1 %>% 
+  ggplot(aes(x = ThyroidClass, y = proportion)) +
+  geom_col()
+```
+Comme on peut le voir ci-dessus, la proportion de gens présentant une maladie est plus importante dans la population diagnostiquée malade de la thyroïde.
+
+Observons 
+
+
+
 ```{r, fig.width = 12}
 thyroid %>% 
-  ggplot(aes(x = (T3_reading_fill), y = (TSH_reading_fill))) +
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T3_reading_fill))) +
   geom_point() +
-  facet_grid(presc_thyroxine ~ ThyroidClass)
+  facet_grid(. ~ ThyroidClass)
 ```
 
 
