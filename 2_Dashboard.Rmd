@@ -1,5 +1,5 @@
 ---
-title: "Based on row"
+title: "Dashboard for thyroid"
 output:
   flexdashboard::flex_dashboard:
     orientation: rows
