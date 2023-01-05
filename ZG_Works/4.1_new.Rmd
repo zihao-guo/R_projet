@@ -89,19 +89,38 @@ df_2 %>%
 ```
 
 
-## facet_grid
+## facet_grid(save)
 ```{r}
 df_2 <- data1 %>% 
-  rename(p_n = 'pregnant')
+  rename(p_n = 'pregnant') %>% 
+  rename(xval = T3_reading_fill) %>% 
+  rename(yval = T4U_rate_reading_fill) %>% 
+  
+  mutate(xval = log(xval)) %>% 
+  mutate(yval = log(yval))
 
 df_2$p_n[df_2$p_n== 0 ]<-"NO"
 df_2$p_n[df_2$p_n== 1 ]<-"YES"
 
 df_2 %>% 
-  ggplot(aes(x = T3_reading_fill, y = T4U_rate_reading_fill)) +
+  ggplot(aes(x = xval, y = yval)) +
   geom_point(aes(colour=p_n))+
   facet_grid(p_n ~ ThyroidClass)
 ```
+## 箱线图
+```{r}
+df_2 <- data1 %>% 
+  rename(p_n = 'pregnant') 
+
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes(x=ThyroidClass, y=T3_reading_fill)) +
+  geom_boxplot(aes(colour=p_n))
+
+```
+
 ```{r}
 df_2 <- data1 %>% 
   group_by(ThyroidClass, patient_gender, tumor) %>% 

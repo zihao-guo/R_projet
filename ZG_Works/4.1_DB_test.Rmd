@@ -89,7 +89,7 @@ selectInput('var', 'Influencing Factors',
                  "the thyroxine utilisation rate" = "thyrox_util_rate_T4U_measured", 
                  "measurement on the Free Thyroxine Index" = "FTI_measured"))
     
-# varSelectInput("variable", "Variable:", data)
+varSelectInput("variable", "Variable:", data1)
 ```
 
 Column {data-width=600}
@@ -121,23 +121,20 @@ df_2 %>%
 ### bar
 ```{r}
 renderPlot({
-  df_2 <- data1 %>% 
-  group_by(ThyroidClass, input$var, input$var2) %>% 
+  df_1 <- data1 %>% 
+  group_by(patient_age_Seg, input$variable) %>% 
   summarise(count = n(),
             .groups = "drop_last") %>% 
-  rename(p_n = input$var) %>% 
-  rename(indic = input$var2)
+  mutate(indicateur = "presc_thyroxine") %>% 
+  rename(p_n = presc_thyroxine)
 
-df_2$indic[df_2$indic== 0 ]<-"NO"
-df_2$indic[df_2$indic== 1 ]<-"YES"
+df_1$p_n[df_1$p_n== 0 ]<-"NO"
+df_1$p_n[df_1$p_n== 1 ]<-"YES"
 
-df_2$p_n[df_2$p_n== 0 ]<-"NO"
-df_2$p_n[df_2$p_n== 1 ]<-"YES"
-
-df_2 %>% 
-  ggplot(aes_string(x = ThyroidClass, y = count)) +
-  geom_col(aes(colour=ThyroidClass, fill=ThyroidClass), position = "dodge")+
-  facet_grid( ~ indic)
+df_1 %>% 
+  ggplot(aes(x = patient_age_Seg, y = count)) +
+  geom_col(aes(colour=p_n, fill=p_n), position = "dodge") +
+  facet_grid(~ indicateur)
 })
 ```
 

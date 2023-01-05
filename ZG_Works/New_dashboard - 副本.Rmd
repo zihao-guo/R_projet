@@ -90,13 +90,18 @@ Column {data-width=400}
 
 renderPlot({
 df_2 <- data1 %>% 
-  rename(p_n = input$var)
+  rename(p_n = input$var) %>% 
+  rename(xval = input$xcol) %>% 
+  rename(yval = input$ycol) %>% 
+  
+  mutate(xval = log(xval)) %>% 
+  mutate(yval = log(yval))
 
 df_2$p_n[df_2$p_n== 0 ]<-"NO"
 df_2$p_n[df_2$p_n== 1 ]<-"YES"
 
 df_2 %>% 
-  ggplot(aes_string(x = input$xcol, y = input$ycol)) +
+  ggplot(aes(x = xval, y = yval)) +
   geom_point(aes(colour=p_n))+
   facet_grid(p_n ~ ThyroidClass) + labs(
     x = as.character(input$xcol),
@@ -185,6 +190,21 @@ renderText({
   
   })
 ```
+### test
+```{r}
+renderPlot({
+  df_2 <- data1 %>% 
+  rename(p_n = 'pregnant') 
+
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes(x=ThyroidClass, y=T3_reading_fill)) +
+  geom_boxplot(aes(colour=p_n))
+})
+```
+
 Column {data-width=500}
 -----------------------------------------------------------------------
 
