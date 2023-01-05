@@ -1,0 +1,175 @@
+---
+title: "Patient group comparison"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(flexdashboard)
+library(shiny)
+library(readr)
+
+library(ggplot2)
+
+data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+data2 <- read.csv("../A_Datas/df_tidy_for_db3.csv")
+
+
+```
+
+
+Input {.sidebar}
+-----------------------------------------------------------
+
+
+```{r}
+type <- c("patient_gender", "presc_thyroxine", "queried_why_on_thyroxine", 
+          #"presc_anthyroid_meds", 
+          "sick", 
+          #"pregnant", "thyroid_surgery", 
+          "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", 
+          # "T4_measured", 
+          "thyrox_util_rate_T4U_measured", "FTI_measured")
+
+selectInput('xcol', 'X Variable', 
+            list(
+              "The reading result of the Free triiodothyronine" = "T3_reading_fill",       
+              "The reading result of the Free thyroxine" = "T4_reading_fill",     
+              "The reading result of the TSH blood test" = "TSH_reading_fill",     
+              "The result of the Free Thyroxine Index" = "FTI_reading_fill",    
+              "The result of the thyroxine utilisation rate" = "T4U_rate_reading_fill"))
+
+selectInput('ycol', 'Y Variable',             
+            list(
+              "The result of the Free Thyroxine Index" = "FTI_reading_fill", 
+              "The reading result of the Free thyroxine" = "T4_reading_fill",  
+              "The reading result of the Free triiodothyronine" = "T3_reading_fill",       
+              "The reading result of the TSH blood test" = "TSH_reading_fill",     
+              "The result of the thyroxine utilisation rate" = "T4U_rate_reading_fill"))
+
+selectInput('var', 'Influencing Factors',
+            list("whether thyroxine replacement prescribed" = "presc_thyroxine",
+                 "Patient Gender" = "patient_gender",
+                 "query has been actioned" = "queried_why_on_thyroxine", 
+                 "sickness due to thyroxine depletion or over activity" = "sick",
+                 "whether anti-thyroid medicine has been prescribed" = "presc_anthyroid_meds",
+                 "whether the patient has had thyroid surgery" = "thyroid_surgery",
+                 "Pregnant or not"  = "pregnant",
+                 "whether patient has had radioactive iodine treatment" = "radioactive_iodine_therapyI131", 
+                 "under active thyroid query" = "query_hypothyroid", 
+                 "over active thyroid query" = "query_hyperthyroid", 
+                 "Lithium carbonate administered to decrease the level of thyroid hormones" = "lithium", 
+                 "swelling of the thyroid gland" = "goitre", 
+                 "Have a tumor" = "tumor", 
+                 "a diagnosed under active thyroid" = "hypopituitarism", 
+                 "whether a patient has a psychological condition" = "psych_condition", 
+                 "A TSH level lower than normal" = "TSH_measured", 
+                 "Is the thyroid gland hyperactive" = "T4_measured",
+                 "free triiodothyronine rise above normal" = "T3_measured", 
+                 "the thyroxine utilisation rate" = "thyrox_util_rate_T4U_measured", 
+                 "measurement on the Free Thyroxine Index" = "FTI_measured"))
+# c(colnames(data1)[2:24],colnames(data1)[30]),
+                # selected=colnames(data1)[[5]])
+
+selectInput("variable",  # 传入变量名称
+            "Positive or not (Gender: F/ M)", # 提示文字
+            list("Positive" = "1",
+                 "Negative" = "0"))
+    
+# varSelectInput("variable", "Variable:", data)
+```
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+### Comparison of hormone values
+```{r, fig.height=10}
+renderPlot({
+df_2 <- data1 %>% 
+  rename(Positive = input$var) %>% 
+  rename(xval = input$xcol) %>% 
+  rename(yval = input$ycol) %>% 
+  
+  mutate(xval = log(xval)) %>% 
+  mutate(yval = log(yval))
+
+df_2$Positive[df_2$Positive== 1 ]<-"YES"
+df_2$Positive[df_2$Positive== 0 ]<-"NO"
+
+df_2 %>% 
+  ggplot(aes(x = xval, y = yval)) +
+  geom_point(aes(colour=Positive))+
+  facet_grid(Positive ~ ThyroidClass) + labs(
+    x = "X Variable",
+    y = "Y Variable",
+    # title = "Numerical variable comparison",
+    subtitle = " ",
+    caption = "Data source: Aymeric Stamm"  )
+})
+
+```
+
+### Comparison of hormone values (Y Variable)
+```{r}
+renderPlot({
+  df_2 <- data1 %>% 
+  rename(Positive = input$var) %>%
+  rename(yval = input$ycol)
+
+df_2$Positive[df_2$Positive== 1 ]<-"YES"
+df_2$Positive[df_2$Positive== 0 ]<-"NO"
+
+
+df_2 %>% 
+  ggplot(aes(x=ThyroidClass, y=yval)) +
+  geom_boxplot(aes(colour=Positive))+ 
+  labs(
+    x = "Illness",
+    y = "Y Variable")
+})
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Comparison of indicators in different patient groups
+```{r}
+renderPlot({
+  data2 <- data2 %>% 
+    filter(p_n == input$variable, indicateur == input$var) %>% 
+    select(-c(p_n, indicateur))
+
+AddRow=c(NA, 
+         nrow(data2)+1, 
+         data2[1,(ncol(data2)-1):ncol(data2)])
+data2 <- rbind(data2, as.numeric(AddRow))
+
+
+data2 <- data2 %>% 
+  mutate(id = c(1:6))
+data2  %>%
+  ggplot(aes(x=id)) +
+  geom_polygon(aes(y=standard),color = "black", fill= "#ffd200",alpha=0.1)+
+  geom_point(aes(y=standard, fill= "#ffd200"),size=5,shape=21,color = 'black',fill= "#ffd200")+
+  
+  geom_polygon(aes(y=mean),color = "black", fill= "#304156",alpha=0.1)+
+  geom_point(aes(y=mean, fill= "#304156"),size=5,shape=21,color = 'black', fill= "#304156")+
+  
+  geom_polygon(aes(y=median),color = "black", fill= "#f8766d",alpha=0.1)+
+  geom_point(aes(y=median, fill= "#f8766d"),size=5,shape=21,color = 'black', fill= "#f8766d")+
+  
+  coord_polar() +
+  scale_x_continuous(breaks =data2$id,labels=data2$name)+
+  theme_light()+
+  theme(axis.text.x=element_text(size = 15,colour="black"))+
+    labs(
+     x = " ", y = "Hormone values",
+    subtitle =  "Tips: Red: Mediam, Yellow: Standard, Gray: Mean" ,
+    caption = "T3: The reading result of the Free triiodothyronine | T4: The reading result of the Free thyroxine, \nTSH: The result of the TSH blood test | FTI:The result of the Free Thyroxine Index. \nT4U: The result of the thyroxine utilisation rate" )
+})
+```
+

@@ -1,0 +1,249 @@
+---
+title: "df_for_db3"
+author: "ZG"
+date: "2022-12-25"
+output: html_document
+---
+```{r setup}
+library(tidyverse)
+library(skimr)
+library(readr)
+```
+
+# 1. Importation des données
+```{r}
+data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+head(data1)
+```
+
+```{r}
+data_sick <- data1 %>%  
+  select(-X)
+```
+
+# 2. Traitement des données
+## 1. patient_gender
+```{r}
+df_1 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, patient_gender) %>% 
+  summarise(count = n(),
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "patient_gender") %>% 
+  rename(positive = patient_gender)
+```
+
+
+## 2. "presc_thyroxine"  
+```{r}
+df_2 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, presc_thyroxine) %>% 
+  summarise(count = n(),
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "presc_thyroxine") %>% 
+  rename(positive = presc_thyroxine)
+```
+## 3. "queried_why_on_thyroxine"
+```{r}
+df_3 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, queried_why_on_thyroxine) %>% 
+  summarise(count = n(),
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "queried_why_on_thyroxine") %>% 
+  rename(positive = queried_why_on_thyroxine)
+```
+## 4. "presc_anthyroid_meds"  
+```{r}
+df_4 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, presc_anthyroid_meds) %>% 
+  summarise(count = n(),
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "presc_anthyroid_meds") %>% 
+  rename(positive = presc_anthyroid_meds)
+```
+## 5. "sick"  
+```{r}
+df_5 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, sick) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "sick") %>% #2
+  rename(positive = sick) #3
+```
+## 6. "pregnant"  
+```{r}
+df_6 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, pregnant) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "pregnant") %>% #2
+  rename(positive = pregnant) #3
+```
+## 7. "thyroid_surgery"   
+```{r}
+df_7 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, thyroid_surgery) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "thyroid_surgery") %>% #2
+  rename(positive = thyroid_surgery) #3
+```
+## 8. "radioactive_iodine_therapyI131"
+```{r}
+df_8 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, radioactive_iodine_therapyI131) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "radioactive_iodine_therapyI131") %>% #2
+  rename(positive = radioactive_iodine_therapyI131) #3
+```
+## 9. "query_hypothyroid"   
+```{r}
+df_9 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, query_hypothyroid) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "query_hypothyroid") %>% #2
+  rename(positive = query_hypothyroid) #3
+```
+## 10. "query_hyperthyroid"  
+```{r}
+df_10 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, query_hyperthyroid) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "query_hyperthyroid") %>% #2
+  rename(positive = query_hyperthyroid) #3
+```
+## 11. "lithium"  
+```{r}
+df_11 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, lithium) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "lithium") %>% #2
+  rename(positive = lithium) #3
+```
+## 12. "goitre"
+```{r}
+df_12 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, goitre) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "goitre") %>% #2
+  rename(positive = goitre) #3
+```
+## 13. "tumor"  
+```{r}
+df_13 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, tumor) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "tumor") %>% #2
+  rename(positive = tumor) #3
+```
+## 14. "hypopituitarism" 
+```{r}
+df_14 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, hypopituitarism) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "hypopituitarism") %>% #2
+  rename(positive = hypopituitarism) #3
+```
+## 15. "psych_condition"   
+```{r}
+df_15 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, psych_condition) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "psych_condition") %>% #2
+  rename(positive = psych_condition) #3
+```
+## 16. "TSH_measured" 
+```{r}
+df_16 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, TSH_measured) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "TSH_measured") %>% #2
+  rename(positive = TSH_measured) #3
+```
+## 17. "T3_measured"  
+```{r}
+df_17 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, T3_measured) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "T3_measured") %>% #2
+  rename(positive = T3_measured) #3
+```
+## 18. "T4_measured" 
+```{r}
+df_18 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, T4_measured) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "T4_measured") %>% #2
+  rename(positive = T4_measured) #3
+```
+## 19. "thyrox_util_rate_T4U_measured" 
+```{r}
+df_19 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, thyrox_util_rate_T4U_measured) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "thyrox_util_rate_T4U_measured") %>% #2
+  rename(positive = thyrox_util_rate_T4U_measured) #3
+```
+## 20. "FTI_measured"
+```{r}
+df_20 <- data_sick %>% 
+  group_by(ThyroidClass, patient_age_Seg, FTI_measured) %>% #1
+  summarise(count = n(), 
+            .groups = "drop_last") %>% 
+  mutate(indicateur = "FTI_measured") %>% #2
+  rename(positive = FTI_measured) #3
+```
+
+
+```{r}
+df_sum <- rbind(df_1, df_2, df_3, df_4, df_5,
+                df_6, df_7, df_8, df_9, df_10,
+           df_11, df_12, df_13, df_14, df_15,
+           df_16, df_17, df_18, df_19, df_20)
+```
+
+```{r}
+df_sum %>% write.csv(file = "../A_Datas/df_tidy_for_db2.csv", row.names=F)
+```
+
+
+
+
+# 3. Visualisation des données
+```{r}
+df_2 <- df_sum %>% 
+  filter(indicateur == "patient_gender")
+
+df_2$positive[df_2$positive == 0 ]<-"NO"
+df_2$positive[df_2$positive == 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes(x = patient_age_Seg, y = count)) +
+  geom_col(aes(colour=positive , fill=positive ), position = "dodge")+
+  facet_wrap( ~ ThyroidClass,nrow=2)
+```
+
+```{r}
+df_2 <- df_sum %>% 
+  filter(indicateur == "patient_gender")
+
+df_2$positive[df_2$positive == 0 ]<-"NO"
+df_2$positive[df_2$positive == 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes(x = positive, y = count)) +
+  geom_col(aes(colour=positive, fill=positive), position = "dodge")+
+  facet_grid( ~ ThyroidClass)
+```
+
