@@ -1,0 +1,512 @@
+data_FTI_reading_fill <- data_sick %>%
+group_by(psych_condition) %>%
+summarise(standard = sd(FTI_reading_fill),
+mean = mean(FTI_reading_fill),
+median = median(FTI_reading_fill))
+data_T4U_rate_reading_fill <- data_sick %>%
+group_by(psych_condition) %>%
+summarise(standard = sd(T4U_rate_reading_fill),
+mean = mean(T4U_rate_reading_fill),
+median = median(T4U_rate_reading_fill))
+patient_gender <- rbind(data_T3_reading_fill,
+data_T4_reading_fill,
+data_TSH_reading_fill,
+data_T4U_rate_reading_fill,
+data_FTI_reading_fill)
+df_patient_gender <- patient_gender %>%
+mutate(indicateur = "psych_condition")  %>%
+rename(p_n = psych_condition) # 改名
+# 加名字
+name <- c("T3_reading", "T3_reading",
+"T4_reading", "T4_reading",
+"TSH_reading", "TSH_reading",
+"FTI_reading", "FTI_reading",
+"T4U_rate_reading", "T4U_rate_reading")
+df_15 <- cbind(name, df_patient_gender) # 改数
+data_T3_reading_fill <- data_sick %>%
+group_by(TSH_measured) %>%
+summarise(standard = sd(T3_reading_fill),
+mean = mean(T3_reading_fill),
+median = median(T3_reading_fill))
+data_T4_reading_fill <- data_sick %>%
+group_by(TSH_measured) %>%
+summarise(standard = sd(T4_reading_fill), # count = n(),
+mean = mean(T4_reading_fill),
+median = median(T4_reading_fill))
+data_TSH_reading_fill <- data_sick %>%
+group_by(TSH_measured) %>%
+summarise(standard = sd(TSH_reading_fill),
+mean = mean(TSH_reading_fill),
+median = median(TSH_reading_fill))
+data_FTI_reading_fill <- data_sick %>%
+group_by(TSH_measured) %>%
+summarise(standard = sd(FTI_reading_fill),
+mean = mean(FTI_reading_fill),
+median = median(FTI_reading_fill))
+data_T4U_rate_reading_fill <- data_sick %>%
+group_by(TSH_measured) %>%
+summarise(standard = sd(T4U_rate_reading_fill),
+mean = mean(T4U_rate_reading_fill),
+median = median(T4U_rate_reading_fill))
+patient_gender <- rbind(data_T3_reading_fill,
+data_T4_reading_fill,
+data_TSH_reading_fill,
+data_T4U_rate_reading_fill,
+data_FTI_reading_fill)
+df_patient_gender <- patient_gender %>%
+mutate(indicateur = "TSH_measured")  %>%
+rename(p_n = TSH_measured) # 改名
+# 加名字
+name <- c("T3_reading", "T3_reading",
+"T4_reading", "T4_reading",
+"TSH_reading", "TSH_reading",
+"FTI_reading", "FTI_reading",
+"T4U_rate_reading", "T4U_rate_reading")
+df_16 <- cbind(name, df_patient_gender) # 改数
+data_T3_reading_fill <- data_sick %>%
+group_by(T3_measured) %>%
+summarise(standard = sd(T3_reading_fill),
+mean = mean(T3_reading_fill),
+median = median(T3_reading_fill))
+data_T4_reading_fill <- data_sick %>%
+group_by(T3_measured) %>%
+summarise(standard = sd(T4_reading_fill), # count = n(),
+mean = mean(T4_reading_fill),
+median = median(T4_reading_fill))
+data_TSH_reading_fill <- data_sick %>%
+group_by(T3_measured) %>%
+summarise(standard = sd(TSH_reading_fill),
+mean = mean(TSH_reading_fill),
+median = median(TSH_reading_fill))
+data_FTI_reading_fill <- data_sick %>%
+group_by(T3_measured) %>%
+summarise(standard = sd(FTI_reading_fill),
+mean = mean(FTI_reading_fill),
+median = median(FTI_reading_fill))
+data_T4U_rate_reading_fill <- data_sick %>%
+group_by(T3_measured) %>%
+summarise(standard = sd(T4U_rate_reading_fill),
+mean = mean(T4U_rate_reading_fill),
+median = median(T4U_rate_reading_fill))
+patient_gender <- rbind(data_T3_reading_fill,
+data_T4_reading_fill,
+data_TSH_reading_fill,
+data_T4U_rate_reading_fill,
+data_FTI_reading_fill)
+df_patient_gender <- patient_gender %>%
+mutate(indicateur = "T3_measured")  %>%
+rename(p_n = T3_measured) # 改名
+# 加名字
+name <- c("T3_reading", "T3_reading",
+"T4_reading", "T4_reading",
+"TSH_reading", "TSH_reading",
+"FTI_reading", "FTI_reading",
+"T4U_rate_reading", "T4U_rate_reading")
+df_17 <- cbind(name, df_patient_gender) # 改数
+data_T3_reading_fill <- data_sick %>%
+group_by(T4_measured) %>%
+summarise(standard = sd(T3_reading_fill),
+mean = mean(T3_reading_fill),
+median = median(T3_reading_fill))
+data_T4_reading_fill <- data_sick %>%
+group_by(T4_measured) %>%
+summarise(standard = sd(T4_reading_fill), # count = n(),
+mean = mean(T4_reading_fill),
+median = median(T4_reading_fill))
+data_TSH_reading_fill <- data_sick %>%
+group_by(T4_measured) %>%
+summarise(standard = sd(TSH_reading_fill),
+mean = mean(TSH_reading_fill),
+median = median(TSH_reading_fill))
+data_FTI_reading_fill <- data_sick %>%
+group_by(T4_measured) %>%
+summarise(standard = sd(FTI_reading_fill),
+mean = mean(FTI_reading_fill),
+median = median(FTI_reading_fill))
+data_T4U_rate_reading_fill <- data_sick %>%
+group_by(T4_measured) %>%
+summarise(standard = sd(T4U_rate_reading_fill),
+mean = mean(T4U_rate_reading_fill),
+median = median(T4U_rate_reading_fill))
+patient_gender <- rbind(data_T3_reading_fill,
+data_T4_reading_fill,
+data_TSH_reading_fill,
+data_T4U_rate_reading_fill,
+data_FTI_reading_fill)
+df_patient_gender <- patient_gender %>%
+mutate(indicateur = "T4_measured")  %>%
+rename(p_n = T4_measured) # 改名
+# 加名字
+name <- c("T3_reading", "T3_reading",
+"T4_reading", "T4_reading",
+"TSH_reading", "TSH_reading",
+"FTI_reading", "FTI_reading",
+"T4U_rate_reading", "T4U_rate_reading")
+df_18 <- cbind(name, df_patient_gender) # 改数
+data_T3_reading_fill <- data_sick %>%
+group_by(thyrox_util_rate_T4U_measured) %>%
+summarise(standard = sd(T3_reading_fill),
+mean = mean(T3_reading_fill),
+median = median(T3_reading_fill))
+data_T4_reading_fill <- data_sick %>%
+group_by(thyrox_util_rate_T4U_measured) %>%
+summarise(standard = sd(T4_reading_fill), # count = n(),
+mean = mean(T4_reading_fill),
+median = median(T4_reading_fill))
+data_TSH_reading_fill <- data_sick %>%
+group_by(thyrox_util_rate_T4U_measured) %>%
+summarise(standard = sd(TSH_reading_fill),
+mean = mean(TSH_reading_fill),
+median = median(TSH_reading_fill))
+data_FTI_reading_fill <- data_sick %>%
+group_by(thyrox_util_rate_T4U_measured) %>%
+summarise(standard = sd(FTI_reading_fill),
+mean = mean(FTI_reading_fill),
+median = median(FTI_reading_fill))
+data_T4U_rate_reading_fill <- data_sick %>%
+group_by(thyrox_util_rate_T4U_measured) %>%
+summarise(standard = sd(T4U_rate_reading_fill),
+mean = mean(T4U_rate_reading_fill),
+median = median(T4U_rate_reading_fill))
+patient_gender <- rbind(data_T3_reading_fill,
+data_T4_reading_fill,
+data_TSH_reading_fill,
+data_T4U_rate_reading_fill,
+data_FTI_reading_fill)
+df_patient_gender <- patient_gender %>%
+mutate(indicateur = "thyrox_util_rate_T4U_measured") %>%
+rename(p_n = thyrox_util_rate_T4U_measured) # 改名
+# 加名字
+name <- c("T3_reading", "T3_reading",
+"T4_reading", "T4_reading",
+"TSH_reading", "TSH_reading",
+"FTI_reading", "FTI_reading",
+"T4U_rate_reading", "T4U_rate_reading")
+df_19 <- cbind(name, df_patient_gender) # 改数
+data_T3_reading_fill <- data_sick %>%
+group_by(FTI_measured) %>%
+summarise(standard = sd(T3_reading_fill),
+mean = mean(T3_reading_fill),
+median = median(T3_reading_fill))
+data_T4_reading_fill <- data_sick %>%
+group_by(FTI_measured) %>%
+summarise(standard = sd(T4_reading_fill), # count = n(),
+mean = mean(T4_reading_fill),
+median = median(T4_reading_fill))
+data_TSH_reading_fill <- data_sick %>%
+group_by(FTI_measured) %>%
+summarise(standard = sd(TSH_reading_fill),
+mean = mean(TSH_reading_fill),
+median = median(TSH_reading_fill))
+data_FTI_reading_fill <- data_sick %>%
+group_by(FTI_measured) %>%
+summarise(standard = sd(FTI_reading_fill),
+mean = mean(FTI_reading_fill),
+median = median(FTI_reading_fill))
+data_T4U_rate_reading_fill <- data_sick %>%
+group_by(FTI_measured) %>%
+summarise(standard = sd(T4U_rate_reading_fill),
+mean = mean(T4U_rate_reading_fill),
+median = median(T4U_rate_reading_fill))
+patient_gender <- rbind(data_T3_reading_fill,
+data_T4_reading_fill,
+data_TSH_reading_fill,
+data_T4U_rate_reading_fill,
+data_FTI_reading_fill)
+df_patient_gender <- patient_gender %>%
+mutate(indicateur = "FTI_measured") %>%
+rename(p_n = FTI_measured)
+# 加名字
+name <- c("T3_reading", "T3_reading",
+"T4_reading", "T4_reading",
+"TSH_reading", "TSH_reading",
+"FTI_reading", "FTI_reading",
+"T4U_rate_reading", "T4U_rate_reading")
+df_20 <- cbind(name, df_patient_gender) # 改数
+df_sum <- rbind(df_1, df_2, df_3, df_4, df_5,
+df_6, df_7, df_8, df_9, df_10,
+df_11, df_12, df_13, df_14, df_15,
+df_16, df_17, df_18, df_19, df_20)
+df_sum$name[df_sum$name== "T4_reading" ]<-"T4"
+df_sum$name[df_sum$name== "T3_reading" ]<-"T3"
+df_sum$name[df_sum$name== "TSH_reading" ]<-"TSH"
+df_sum$name[df_sum$name== "FTI_reading" ]<-"FTI"
+df_sum$name[df_sum$name== "T4U_rate_reading" ]<-"T4U"
+df_sum %>% write.csv(file = "../../A_Datas/df_tidy_for_db3.csv", row.names=F)
+df_sum$name[df_sum$name== "T4_reading" ]<-"T4"
+df_sum$name[df_sum$name== "T3_reading" ]<-"T3"
+df_sum$name[df_sum$name== "TSH_reading" ]<-"TSH"
+df_sum$name[df_sum$name== "FTI_reading" ]<-"FTI"
+df_sum$name[df_sum$name== "T4U_rate_reading" ]<-"T4U"
+df_sum %>% write.csv(file = "../A_Datas/df_tidy_for_db3.csv", row.names=F)
+library(tidyverse)
+library(skimr)
+library(ggplot2)
+library(reshape2)
+library(broom)
+library(stats)
+library(readr)
+data1 <- read.csv("A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+# thyroid <- read_csv("C:/Users/roman/Downloads/thyroid.csv")
+problems(data1)
+# Résoudre le problème de jeu des données
+data1$patient_age[which(data1$patient_age =='28;0')] <- 28
+# Afficher les données
+DT::datatable(data1)
+# Transformation des données en données numériques
+thyroid_cor <- data1
+thyroid_cor$ThryroidClass <- as.numeric(factor(thyroid_cor$ThryroidClass))
+library(tidyverse)
+library(readr)
+library(ggplot2)
+data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+head(data1)
+data_age_pre <- data1 %>%
+group_by(patient_age_Seg, presc_thyroxine) %>%
+summarise(count = n(),
+.groups = "drop_last")
+data_age_pre$presc_thyroxine[data_age_pre$presc_thyroxine== 0 ]<-"NO"
+data_age_pre$presc_thyroxine[data_age_pre$presc_thyroxine== 1 ]<-"YES"
+ggplot(data=data_age_pre,
+mapping=aes(x=patient_age_Seg,y=count))+
+geom_point(aes(size=count, colour=presc_thyroxine),alpha=1/3 )
+df_1 <- data1 %>%
+group_by(patient_age_Seg, presc_thyroxine) %>%
+summarise(count = n(),
+.groups = "drop_last") %>%
+mutate(indicateur = "presc_thyroxine") %>%
+rename(p_n = presc_thyroxine)
+df_1$p_n[df_1$p_n== 0 ]<-"NO"
+df_1$p_n[df_1$p_n== 1 ]<-"YES"
+df_1 %>%
+ggplot(aes(x = patient_age_Seg, y = count)) +
+geom_col(aes(colour=p_n, fill=p_n), position = "dodge") +
+facet_grid(~ indicateur)
+df_2 <- data1 %>%
+group_by(patient_age_Seg, tumor) %>%
+summarise(count = n(),
+.groups = "drop_last") %>%
+mutate(indicateur = "tumor") %>%
+rename(p_n = tumor)
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df <- rbind(df_1, df_2)
+df %>%
+ggplot(aes(x = patient_age_Seg, y = count)) +
+geom_col(aes(colour=p_n, fill=p_n), position = "dodge") +
+facet_grid(~ indicateur)
+df_2 <- data1 %>%
+group_by(ThyroidClass, patient_gender, tumor) %>%
+summarise(count = n(),
+.groups = "drop_last") %>%
+rename(p_n = 'tumor') %>%
+rename(indic = 'patient_gender')
+df_2$indic[df_2$indic== 0 ]<-"NO"
+df_2$indic[df_2$indic== 1 ]<-"YES"
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(x = ThyroidClass, y = count)) +
+geom_col(aes(colour=ThyroidClass, fill=ThyroidClass), position = "dodge")+
+facet_grid( ~ indic)
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(x = T3_reading_fill, y = T4U_rate_reading_fill)) +
+geom_point(aes(colour=p_n))+
+facet_grid(p_n ~ ThyroidClass)
+df_2 <- data1 %>%
+group_by(ThyroidClass, patient_gender, tumor) %>%
+summarise(count = n(),
+.groups = "drop_last") %>%
+rename(p_n = 'tumor') %>%
+rename(indic = 'patient_gender')
+df_2$indic[df_2$indic== 0 ]<-"NO"
+df_2$indic[df_2$indic== 1 ]<-"YES"
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(x = indic, y = count)) +
+geom_col(aes(colour=p_n, fill=p_n), position = "dodge")+
+facet_grid(p_n ~ ThyroidClass)
+bin_var <- c("patient_gender", "presc_thyroxine", "queried_why_on_thyroxine", "presc_anthyroid_meds", "sick", "pregnant", "thyroid_surgery", "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism",
+"psych_condition", "TSH_measured", "T3_measured", "T4_measured", "thyrox_util_rate_T4U_measured", "FTI_measured")
+data1 %>%
+group_by(patient_gender, presc_thyroxine, queried_why_on_thyroxine, presc_anthyroid_meds, sick, pregnant, thyroid_surgery, radioactive_iodine_therapyI131, query_hypothyroid, query_hyperthyroid, lithium, goitre, tumor, hypopituitarism,
+psych_condition, TSH_measured, T3_measured, T4_measured, thyrox_util_rate_T4U_measured, FTI_measured) %>%
+summarise(count = n(),
+.groups = "drop_last") %>%
+head()
+library(tidyverse)
+library(readr)
+library(ggplot2)
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(x = np.log(T3_reading_fill), y = np.log(T4U_rate_reading_fill))) +
+geom_point(aes(colour=p_n))+
+facet_grid(p_n ~ ThyroidClass)
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(x = log(T3_reading_fill), y = log(T4U_rate_reading_fill))) +
+geom_point(aes(colour=p_n))+
+facet_grid(p_n ~ ThyroidClass)
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+a = T3_reading_fill
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+a = "T3_reading_fill"
+df_2 %>%
+ggplot(aes(x = log(a), y = log(T4U_rate_reading_fill))) +
+geom_point(aes(colour=p_n))+
+facet_grid(p_n ~ ThyroidClass)
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(x = log(T3_reading_fill), y = log(T4U_rate_reading_fill))) +
+geom_point(aes(colour=p_n))+
+facet_grid(p_n ~ ThyroidClass)
+df_2$T3_reading_fill
+data1 %>%
+rename(p_n = 'pregnant') %>%
+mutate(xval = log(T3_reading_fill))
+df_2 <- data1 %>%
+rename(p_n = 'pregnant') %>%
+rename(xval = T3_reading_fill) %>%
+rename(yval = T4U_rate_reading_fill) %>%
+mutate(xval = log(xval)) %>%
+mutate(yval = log(yval))
+mutate(xval = log(T3_reading_fill))
+df_2 <- data1 %>%
+rename(p_n = 'pregnant') %>%
+rename(xval = T3_reading_fill) %>%
+rename(yval = T4U_rate_reading_fill) %>%
+mutate(xval = log(xval)) %>%
+mutate(yval = log(yval))
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(x = xval, y = yval)) +
+geom_point(aes(colour=p_n))+
+facet_grid(p_n ~ ThyroidClass)
+df_1 <- data1 %>%
+group_by(patient_age_Seg, presc_thyroxine) %>%
+summarise(count = n(),
+.groups = "drop_last") %>%
+mutate(indicateur = "presc_thyroxine") %>%
+rename(p_n = presc_thyroxine)
+df_1$p_n[df_1$p_n== 0 ]<-"NO"
+df_1$p_n[df_1$p_n== 1 ]<-"YES"
+df_1 %>%
+ggplot(aes(x = patient_age_Seg, y = count)) +
+geom_boxplot(aes(colour=p_n, fill=p_n)) +
+facet_grid(~ indicateur)
+df_2 <- data1 %>%
+group_by(patient_age_Seg, tumor) %>%
+summarise(count = n(),
+.groups = "drop_last") %>%
+mutate(indicateur = "tumor") %>%
+rename(p_n = tumor)
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df <- rbind(df_1, df_2)
+df %>%
+ggplot(aes(x = patient_age_Seg, y = count)) +
+geom_boxplot(aes(colour=p_n, fill=p_n)) +
+facet_grid(~ indicateur)
+```{r}
+df_2 <- data1 %>%
+rename(p_n = 'pregnant') %>%
+rename(xval = T3_reading_fill) %>%
+rename(yval = T4U_rate_reading_fill) %>%
+mutate(xval = log(xval)) %>%
+mutate(yval = log(yval))
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(xval)) +
+geom_boxplot(aes(colour=p_n))
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(T3_reading_fill)) +
+geom_boxplot(aes(colour=p_n))
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(xlab=T3_reading_fill, ylab=T4_reading_fill)) +
+geom_boxplot(aes(colour=p_n))
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(xlab=T3_reading_fill)) +
+geom_boxplot(aes(colour=p_n))
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(ylab=T3_reading_fill)) +
+geom_boxplot(aes(colour=p_n))
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(T3_reading_fill)) +
+geom_boxplot(aes(colour=p_n))
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(xlab = p_n,ylab=T3_reading_fill)) +
+geom_boxplot(aes(colour=p_n))
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(col=T3_reading_fill)) +
+geom_boxplot()
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+boxplot(col=T3_reading_fill)
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(x=p_n, y=T3_reading_fill)) +
+geom_boxplot(aes(colour=p_n))
+df_2
+df_2 <- data1 %>%
+rename(p_n = 'pregnant')
+df_2$p_n[df_2$p_n== 0 ]<-"NO"
+df_2$p_n[df_2$p_n== 1 ]<-"YES"
+df_2 %>%
+ggplot(aes(x=ThyroidClass, y=T3_reading_fill)) +
+geom_boxplot(aes(colour=p_n))

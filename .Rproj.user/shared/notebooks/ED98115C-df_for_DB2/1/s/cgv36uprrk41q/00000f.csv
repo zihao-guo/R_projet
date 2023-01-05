@@ -1,0 +1,6 @@
+"0","df_9 <- data_sick %>% "
+"0","  group_by(ThyroidClass, patient_age_Seg, query_hypothyroid) %>% #1"
+"0","  summarise(count = n(), "
+"0","            .groups = ""drop_last"") %>% "
+"0","  mutate(indicateur = ""query_hypothyroid"") %>% #2"
+"0","  rename(positive = query_hypothyroid) #3"

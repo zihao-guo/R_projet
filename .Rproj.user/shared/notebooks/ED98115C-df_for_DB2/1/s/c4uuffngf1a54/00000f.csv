@@ -1,0 +1,6 @@
+"0","df_17 <- data_sick %>% "
+"0","  group_by(ThyroidClass, patient_age_Seg, T3_measured) %>% #1"
+"0","  summarise(count = n(), "
+"0","            .groups = ""drop_last"") %>% "
+"0","  mutate(indicateur = ""T3_measured"") %>% #2"
+"0","  rename(positive = T3_measured) #3"

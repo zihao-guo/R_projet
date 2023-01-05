@@ -1,0 +1,2 @@
+"0","data1 <- read.csv(""../../A_Datas/df_tidy_for_db3.csv"",encoding = 'UTF-8')"
+"0","head(data1)"

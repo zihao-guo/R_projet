@@ -1,0 +1,6 @@
+"0","data_age_pre <- data1 %>% "
+"0","  group_by(patient_age_Seg, presc_thyroxine) %>% "
+"0","  summarise(count = n(),"
+"0","            .groups = ""drop_last"")"
+"0","data_age_pre$presc_thyroxine[data_age_pre$presc_thyroxine== 0 ]<-""NO"""
+"0","data_age_pre$presc_thyroxine[data_age_pre$presc_thyroxine== 1 ]<-""YES"""

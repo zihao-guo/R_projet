@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+<link href="lib/selectize-0.12.4/css/selectize.bootstrap3.css" rel="stylesheet" />
+<script src="lib/selectize-0.12.4/js/selectize.min.js"></script>
+<script src="lib/selectize-0.12.4/accessibility/js/selectize-plugin-a11y.min.js"></script>
+
+</head>
+<body>
+<div class="form-group shiny-input-container">
+  <label class="control-label" id="ycol-label" for="ycol">Y Variable</label>
+  <div>
+    <select id="ycol"><option value="FTI_reading_fill" selected>The result of the Free Thyroxine Index</option>
+<option value="T4_reading_fill">The reading result of the Free thyroxine</option>
+<option value="T3_reading_fill">The reading result of the Free triiodothyronine</option>
+<option value="TSH_reading_fill">The reading result of the TSH blood test</option>
+<option value="T4U_rate_reading_fill">The result of the thyroxine utilisation rate</option></select>
+    <script type="application/json" data-for="ycol" data-nonempty="">{"plugins":["selectize-plugin-a11y"]}</script>
+  </div>
+</div>
+</body>
+</html>
