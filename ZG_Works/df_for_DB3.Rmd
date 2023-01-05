@@ -1,5 +1,5 @@
 ---
-title: "Vis"
+title: "df_for_db3"
 author: "ZG"
 date: "2022-12-25"
 output: html_document
@@ -16,8 +16,7 @@ data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
 head(data1)
 ```
 ```{r}
-data_sick <- data1 %>% 
-  filter(ThyroidClass == "sick") %>% 
+data_sick <- data1 %>%  
   select(-X)
 ```
 
@@ -1085,8 +1084,8 @@ df_sum %>% write.csv(file = "../A_Datas/df_tidy_for_db3.csv", row.names=F)
 # 3. Visualisation des données
 
 ```{r}
-data2 <- data1 %>% 
-    filter(indicateur == 'patient_gender', p_n == 0) %>% 
+data2 <- df_sum %>% 
+    filter(p_n == 0, indicateur == 'patient_gender') %>% 
     select(-c(p_n, indicateur))
 
 AddRow=c(NA, 
@@ -1094,8 +1093,10 @@ AddRow=c(NA,
          data2[1,(ncol(data2)-1):ncol(data2)])
 data2 <- rbind(data2, as.numeric(AddRow))
 
+
 data2 <- data2 %>% 
   mutate(id = c(1:6))
+
 data2  %>%
   ggplot(aes(x=id)) +
   geom_polygon(aes(y=standard),color = "black", fill= "#ffd200",alpha=0.1)+
