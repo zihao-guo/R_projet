@@ -1,12 +1,16 @@
 ---
-title: "Rapport"
+title: "Rapport du projet R"
 author:
 - name: Clément Reis
 - name: Zihao Guo
 - name: Romane Tézé
 output: html_document
-date: "2023-01-05"
 ---
+
+<style>
+body {
+text-align: justify}
+</style>
 
 ```{r setup, include = FALSE}
 library(tidyverse)
@@ -19,26 +23,26 @@ colnames(raw)[1] <- "ThyroidClass"
 ```
 
 
-# Introduction
+# <u> I. Introduction </u>
 
-La thyroïde est une glande en forme de papillon, située à la base du cou, qui produit des hormones jouant un rôle important dans le métabolisme énergétique. Lorsque la thyroïde dysfonctionne, elle produit soit un excès d'hormones thyroïdiennes ; on parle alors d'hyperthyroïde, soit elle ne parvient plus à en produire suffisamment, et on parle alors d'hypothyroïde. L'objectif du projet est de créer des dashboard facilitant la visualisation d'un jeu de données sur la thyroïde, et d'en extraire des informations sur les facteurs permettant de diagnostiquer efficacement une maladie de la thyroïde.
+<div style="text-indent: 20px;"> La thyroïde est une glande en forme de papillon, située à la base du cou, qui produit des hormones jouant un rôle important dans le métabolisme énergétique. Lorsque la thyroïde dysfonctionne, elle produit soit un excès d'hormones thyroïdiennes ; on parle alors d'hyperthyroïde, soit elle ne parvient plus à en produire suffisamment, et on parle alors d'hypothyroïde. L'objectif du projet est de créer des dashboard facilitant la visualisation d'un jeu de données sur la thyroïde, et d'en extraire des informations sur les facteurs permettant de diagnostiquer efficacement une maladie de la thyroïde.
 
-# Traitement des données
+# <u> II. Traitement des données </u>
 
-Le dataset brut à notre disposition contient de nombreuses informations relatives à la thyroïde, relevées sur 3 772 patients.
+<div style="text-indent: 20px;"> Le dataset brut à notre disposition contient de nombreuses informations relatives à la thyroïde, relevées sur 3 772 patients.
 
-```{r, echo = FALSE, warning = FALSE}
+```{r, echo = FALSE, warning = FALSE, message=FALSE}
 glimpse(raw)
 ```
-Les patients dont la thyroïde a été diagnostiquée malade sont indiqués par le label "sick" dans la colonne ThyroidClass (à noter que la variable dans le dataset original était appelée "ThryroidClass". Nous l'avons modifié pour "ThyroidClass" dans notre dataset et nous utiliserons ce nom dans tout le rapport.). Dans le cas contraire, c'est le label "negative" qui s'affiche. Ces données ne sont pas toujours en cohérence avec les données de la colonne "sick", qui indique si le patient souffre d'une maladie due à un manque (hypothyroïde) ou à un excès (hyperthyroïde) de thyroxine (hormone thyroïdienne T4), c'est-à-dire des symptômes d'une hypo ou d'une hyperthyroïdie. 
-De nombreuses variables binaires nous indiquent le sexe du patient (1 si c'est une femme, 0 si c'est un homme), si celui-ci est sous prescription de thyroxine pour remplacer un manque (1 = presciption), ou au contraire de médicaments anti-thyroïdien pour contrer un excès (1 = prescription), si le patient est enceinte, s'il a subi une chirurgie de la thyroïde, s'il est ou a été soumis à un traitement à l'iodine radioactive (en cas d'hyperthyroïde), s'il est ou a été soumis à un traitement au lithium (en cas d'hyperthyroïde), s'il a un goitre, ou encore une tumeur, s'il a été diagnostiqué hypopituitarisme (thyroïde sous-active), et s'il possède ou non une condition psychologique particulière. L'âge de chaque patient est également donné.
-Nous pouvons également savoir si des recherches sont en cours sur chaque patient. Les variables "queried_why_on_thyroxine", "query_hypothyroid" et "query_hyperthyroid" indiquent respectivement si une recherche est en cours sur l'origine du traitement à la thyroxine, sur une possible hypothyroïde ou sur une possible hyperthyroïde.
-Enfin, des taux d'hormones thyroïdiennes sont données (l'unité n'est pas précisée). Les hormones T4 (thyroxine) sont les prohormones des hormones T3 (triiodothyronine). Les hormones T4 doivent être déionisées en hormones T3 pour être pleinement actives. Les taux de production de ces deux hormones par la thyroïde dépendent du taux de TSH (thyréostimuline), hormone produite par le cerveau. Le taux de FTI (Free Thyroxine Index) correspond au taux total de T4 sur la "binding capacity" de la thyroïde. Une partie des hormones T4 sont destinées à transporter des protéines, et le taux de FTI indique la part de celles qui sont libres. Enfin, nous disposons également du taux d'utilisation de l'hormone T4. Chacune des ces mesures est accompagnée d'une variable binaire "measured" qui indique si oui (1) ou non (0) le taux de l'hormone considérée a été mesurée chez ce patient.
-Enfin, une chaîne de caractère indique la source du patient, dans la variable "ref_src".
+<div style="text-indent: 20px;"> Les patients dont la thyroïde a été diagnostiquée malade sont indiqués par le label *sick* dans la colonne **ThyroidClass** (à noter que la variable dans le dataset original était appelée **ThryroidClass**. Nous l'avons modifiée pour **ThyroidClass** dans notre dataset et nous utiliserons ce nom dans tout le rapport.). Dans le cas contraire, c'est le label *negative* qui s'affiche. Ces données ne sont pas toujours en cohérence avec les données de la colonne **sick**, qui indique si le patient souffre d'une maladie due à un manque (hypothyroïde) ou à un excès (hyperthyroïde) de thyroxine (hormone thyroïdienne T4), c'est-à-dire des symptômes d'une hypo ou d'une hyperthyroïdie. 
+<div style="text-indent: 20px;"> Des variables binaires nous indiquent le sexe du patient (1 si c'est une femme, 0 si c'est un homme), si celui-ci est sous prescription de thyroxine pour remplacer un manque (1 = presciption), ou au contraire de médicaments anti-thyroïdien pour contrer un excès (1 = prescription), si le patient est enceinte, s'il a subi une chirurgie de la thyroïde, s'il est ou a été soumis à un traitement à l'iodine radioactive (en cas d'hyperthyroïde), s'il est ou a été soumis à un traitement au lithium (en cas d'hyperthyroïde), s'il a un goitre, ou encore une tumeur, s'il a été diagnostiqué hypopituitarisme (thyroïde sous-active), et s'il possède ou non une condition psychologique particulière. L'âge de chaque patient est également donné.
+<div style="text-indent: 20px;"> Nous pouvons également savoir si des recherches sont en cours sur chaque patient. Les variables **queried_why_on_thyroxine**, **query_hypothyroid** et **query_hyperthyroid** indiquent respectivement si une recherche est en cours sur l'origine du traitement à la thyroxine, sur une possible hypothyroïde ou sur une possible hyperthyroïde.
+<div style="text-indent: 20px;"> Enfin, des taux d'hormones thyroïdiennes sont données (l'unité n'est pas précisée). Les hormones T4 (thyroxine) sont les prohormones des hormones T3 (triiodothyronine). Les hormones T4 doivent être déionisées en hormones T3 pour être pleinement actives. Les taux de production de ces deux hormones par la thyroïde dépendent du taux de TSH (thyréostimuline), hormone produite par le cerveau. Le taux de FTI (Free Thyroxine Index) correspond au taux total de T4 sur la "binding capacity" de la thyroïde. Une partie des hormones T4 sont destinées à transporter des protéines, et le taux de FTI indique la part de celles qui sont libres. Enfin, nous disposons également du taux d'utilisation de l'hormone T4. Chacune des ces mesures est accompagnée d'une variable binaire **measured** qui indique si oui (1) ou non (0) le taux de l'hormone considérée a été mesurée chez ce patient.
+<div style="text-indent: 20px;"> Enfin, une chaîne de caractère indique la source du patient, dans la variable **ref_src**.
 
 Observons la corrélation de toutes ces variables.
 
-```{r, fig.height = 10, fig.width = 12, echo = FALSE, warning = FALSE}
+```{r, fig.height = 10, fig.width = 12, echo = FALSE, warning = FALSE, fig.align='center', message = FALSE}
 thyroid_for_cor <- drop_na(raw)
 corr <- round(cor(data.matrix(thyroid_for_cor)), 1)
 cor.mat <- ggcorrplot::cor_pmat(data.matrix(thyroid_for_cor))
@@ -51,28 +55,28 @@ ggcorrplot::ggcorrplot(corr, type="lower", p.mat = cor.mat)
 
 
 
-Les cases colorées indiquent les corrélations significatives. Les taux d'hormones sont, comme attendu, corrélés entre eux. Cette matrice nous sera utile dans la suite.
+Les cases colorées indiquent les corrélations significatives. Les taux d'hormones sont, comme attendu, corrélés entre eux.
 
 
 
 
 
-```{r, echo = FALSE, warning = FALSE}
+```{r, echo = FALSE, warning = FALSE, fig.align='center', message = FALSE}
 skimr::skim(raw)
 ```
 
 
-Comme on peut le voir, les variables "TSH_reading", "T3_reading",  "T4_reading", "thyrox_util_rate_T4U_reading" et "FTI_reading" ont de nombreuses valeurs manquantes. Il s'agit en réalité de valeurs non relevée sur le patient (correspondant donc à la variable binaire "X_measured" égale à 0).
-La variable "patient_age" possède également une valeur manquante.
+Comme on peut le voir, les variables **TSH_reading**, **T3_reading**,  **T4_reading**, **thyrox_util_rate_T4U_reading** et **FTI_reading** ont de nombreuses valeurs manquantes. Il s'agit en réalité de valeurs non relevée sur le patient (correspondant donc à la variable binaire **X_measured** égale à 0).
+La variable **patient_age** possède également une valeur manquante.
 
-```{r, echo = FALSE, warning = FALSE}
+```{r, echo = FALSE, warning = FALSE, fig.align='center', message = FALSE}
 naniar::gg_miss_var(raw)
 ```
 
 
-Les méthodes les plus courantes pour remplir des données manquantes sont de mettre 0, de remplir par la moyenne de la colonne ou bien d'utiliser l'algorithme knn. 
-Mettre 0 n'aurait pas de sens ici, et remplir par la moyenne nous a semblé être trop grossier. Nous avons préféré utiliser la méthodes knn du package simputation, dans l'idée que des patients aux caractéristiques similaires devraient présenter des taux similaires.
-La méthode knn a de plus certains avantages. Elle n'est pas négativement impactée par l'utilisation de variables corrélées en tant que prédicteur, et de plus elle est capable de gérer la présence de données manquantes au sein des prédicteurs, la rendant particulièrement adaptée à notre situation. Ci-dessous les résultats graphiques de l'imputation.
+<div style="text-indent: 20px;"> Les méthodes les plus courantes pour remplir des données manquantes sont de mettre 0, de remplir par la moyenne de la colonne ou bien d'utiliser l'algorithme *knn*. 
+<div style="text-indent: 20px;"> Mettre 0 n'aurait pas de sens ici, et remplir par la moyenne nous a semblé être trop grossier. Nous avons préféré utiliser la méthodes *knn* du package **simputation**, dans l'idée que des patients aux caractéristiques similaires devraient présenter des taux similaires.
+<div style="text-indent: 20px;"> La méthode *knn* a de plus certains avantages. Elle n'est pas négativement impactée par l'utilisation de variables corrélées en tant que prédicteur, et de plus elle est capable de gérer la présence de données manquantes au sein des prédicteurs, la rendant particulièrement adaptée à notre situation. Ci-dessous les résultats graphiques de l'imputation.
 
 
 
@@ -82,13 +86,13 @@ thyroid <- readr::read_csv("../A_Datas/thyroid_tidy.csv")
 NA_data <- naniar::bind_shadow(raw)
 ```
 
-```{r, echo = FALSE, fig.height = 10, fig.width = 12, warning = FALSE}
+```{r, echo = FALSE, fig.height = 10, fig.width = 12, warning = FALSE, fig.align='center', message = FALSE}
 plot1 <- thyroid %>%
   ggplot(aes(x = T4_reading_fill,
              y = T3_reading_fill,
              colour = NA_data$T3_reading_NA)) + 
   geom_point() +
-  labs(color = "NA")
+  labs(x = "Taux de T4", y = "Taux de T3", color = "NA ou non", title = "T3 en fonction de T4")
 
 
 plot2 <- thyroid %>%
@@ -96,14 +100,14 @@ plot2 <- thyroid %>%
              y = TSH_reading_fill,
              colour = NA_data$TSH_reading_NA)) + 
   geom_point() +
-  labs(color = "NA")
+  labs(x = "Taux de T4", y = "Taux de TSH", color = "NA ou non", title = "TSH en fonction de T4")
 
 plot3 <- thyroid %>% 
   ggplot(aes(x = T4_reading_fill,
              y = FTI_reading_fill,
              colour = NA_data$FTI_reading_NA)) + 
   geom_point() +
-  labs(color = "NA")
+  labs(x = "Taux de T4", y = "FTI", color = "NA ou non", title = "FTI en fonction de T4")
 
 plot4 <- thyroid %>% 
   ggplot(aes(x = T4_reading_fill,
@@ -119,16 +123,19 @@ gridExtra::grid.arrange(plot1, plot2, plot3, plot4, nrow=4)
 
 Les données imputées semblent se distribuer de la même façon que les données réelles.
 
-# Le dashboard
+# <u> III. Le dashboard </u>
+
+<div style="text-indent: 20px;"> Le dashboard doit fonctionner avec nos données modifiées. Les packages DT et ggradar sont nécessaires.
 
 Notre dashboard est constitué de trois pages :
-- la première est un récapitulatif des informations de chaque patient. Chaque patient est identifié par un numéro qui correspond au numéro de sa ligne dans le dataset. L'utilisateur peut sélectionner dans la sidebar le numéro voulu.
-- la seconde contient un résumé des données...
-- la troisième permet de visualiser...
 
-# Analyse des données
+1. la première est un récapitulatif des informations de chaque patient. Chaque patient est identifié par un numéro qui correspond au numéro de sa ligne dans le dataset. L'utilisateur peut sélectionner dans la sidebar le numéro voulu.
+2. la seconde contient un résumé des données du dataset.
+3. la troisième permet de visualiser les données sous forme de graphique, de radar ou de boxplot. La variable X et Y du graphique sont au choix de l'utilisateur. De même, l'utilisateur peut choisir le facteur d'influence qu'il souhaite observer dans le graphique. Ce facteur d'influence choisi est décrit par le radar chart. Les variables X et Y sont décrites par les boxplots.
 
-Lors d'une maladie de la thyroïde, de nombreux symptômes peuvent apparaître. Dans le cas d'une hyperthyroïde (excès d'hormones thyroïdiennes), on observe chez le patient une anxiété, une irritabilité, une perte de poids, et des problèmes de visions. En cas d'hypothyroïde (manque d'hormones thyroîdiennes), on observe chez le patient une sensation de fatigue, une prise de poids, une voix rauque, et une sensibilité accrue au froid. La première étape pour détecter une potentielle maladie de la thyroïde serait donc d'observer ces symptômes.
+# <u> IV. Analyse des données </u>
+
+<div style="text-indent: 20px;"> Lors d'une maladie de la thyroïde, de nombreux symptômes peuvent apparaître. Dans le cas d'une hyperthyroïde (excès d'hormones thyroïdiennes), on observe chez le patient une anxiété, une irritabilité, une perte de poids, et des problèmes de visions. En cas d'hypothyroïde (manque d'hormones thyroîdiennes), on observe chez le patient une sensation de fatigue, une prise de poids, une voix rauque, et une sensibilité accrue au froid. La première étape pour détecter une potentielle maladie de la thyroïde serait donc d'observer ces symptômes.
 
 ```{r, include = FALSE}
 n_thyroid <-  nrow(thyroid %>% 
@@ -147,10 +154,11 @@ prop1 <- thyroid %>%
   mutate(proportion = n_sick/population)
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center', warning=FALSE, message = FALSE}
 prop1 %>% 
   ggplot(aes(x = ThyroidClass, y = proportion)) +
-  geom_col()
+  geom_col() +
+  labs(x = "Thyroïde", y = "Proportion", title = "Proportion des patients ayant une thyroïde malade ou saine dans les données")
 ```
 Comme on peut le voir ci-dessus, la proportion de gens présentant une maladie est plus importante dans la population diagnostiquée malade de la thyroïde.
 
@@ -164,175 +172,130 @@ prop2 <- thyroid %>%
   mutate(prop_goitre = n_goitre/population, prop_tumor = n_tumor/population, prop_surg = n_surg/population, prop_psy = n_psy/population)
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='center', warning=FALSE, message = FALSE}
 plot.goitre <- prop2 %>% 
   ggplot(aes(x = ThyroidClass, y = prop_goitre)) +
-  geom_col()
+  geom_col() +
+  labs(x = "Thyroïde", y = "Proportion", title = "Proportion des patients ayant un goitre dans les populations saines et malades")
 
 plot.tumor <- prop2 %>% 
   ggplot(aes(x = ThyroidClass, y = prop_tumor)) +
-  geom_col()
+  geom_col() +
+  labs(x = "Thyroïde", y = "Proportion", title = "Proportion des patients ayant une tumeur dans les populations saines et malades")
 
 plot.surg <- prop2 %>% 
   ggplot(aes(x = ThyroidClass, y = prop_surg)) +
-  geom_col()
+  geom_col() +
+  labs(x = "Thyroïde", y = "Proportion", title = "Proportion des patients ayant subi une chirurgie de la thyroïde dans les populations saines et malades")
 
 plot.psy <- prop2 %>% 
   ggplot(aes(x = ThyroidClass, y = prop_psy)) +
-  geom_col()
+  geom_col() +
+  labs(x = "Thyroïde", y = "Proportion", title = "Proportion des patients ayant des conditions psychologiques particulières dans les populations saines et malades")
 
 gridExtra::grid.arrange(plot.goitre, plot.tumor, plot.surg, plot.psy, nrow = 2)
 ```
 
-Même si de nombreuses personnes atteintes d'hyperthyroïde ont tendance à développer un goitre, le goitre peut aussi apparaître en cas de carences alimentaires, par exemple. De même, comme le montre les graphes ci-dessus, les patients malades n'ont pas plus de tumeur, de chirurgue, ou de condition psychologique que les patients non malades.
-Aucunes de ces quatre variables (goitre, thyroid_surgery, tumor, psy_condition) ne semble donc être un indicateur adapté d'une maladie de la thyroïde.
-Cela correspond aux informations fournies par la matrice de corrélation présentée plus haut. Il n'y avait aucune corrélation (linéaire) significative entre la variable ThyroidClass et les variables goitre, tumor, thyroid_surgery et psy_condition.
+<div style="text-indent: 20px;"> Même si de nombreuses personnes atteintes d'hyperthyroïde ont tendance à développer un goitre, le goitre peut aussi apparaître en cas de carences alimentaires, par exemple. De même, comme le montre les graphes ci-dessus, les patients malades n'ont pas plus de tumeur, de chirurgue, ou de condition psychologique que les patients non malades.
+<div style="text-indent: 20px;"> Aucune de ces quatre variables (**goitre**, **thyroid_surgery**, **tumor**, **psy_condition**) ne semble donc être un indicateur adapté d'une maladie de la thyroïde.
+<div style="text-indent: 20px;"> Cela correspond aux informations fournies par la matrice de corrélation présentée plus haut. Il n'y avait aucune corrélation (linéaire) significative entre la variable ThyroidClass et les variables goitre, tumor, thyroid_surgery et psy_condition.
 
-Intéressons-nous à présent aux hormones. En cas de suspicion d'hyperthyroïde ou d'hypothyroïde, les médecins réalisent généralement un bilan sanguin, et examinent les taux de TSH, de T3 et de T4, afin de détecter de potentielles anomalies.
+<div style="text-indent: 20px;"> Intéressons-nous à présent aux hormones. En cas de suspicion d'hyperthyroïde ou d'hypothyroïde, les médecins réalisent généralement un bilan sanguin, et examinent les taux de TSH, de T3 et de T4, afin de détecter de potentielles anomalies.
 
+<div style="text-indent: 20px;"> C'est le taux de TSH en priorité observé. Le taux de TSH doit normalement se trouver entre 0.35 - 5 mU/L. (On suppose ici que les données ont bel et bien cette unité). Les lignes horizontales indiquent le domaine normal du taux de TSH. On utilisera le logarithme des données pour faciliter leur exploitation.
 
-Commençons par l'hormone T4.
-Les nuages de point initiaux étant difficilement exploitables, on travaillera avec les logarithmes des données.
-
-```{r, fig.width = 12, echo = FALSE}
+```{r, fig.width = 12, echo = FALSE, fig.align='center', warning=FALSE, message = FALSE}
 thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  ggplot(aes(x = patient_age, y = log(TSH_reading_fill), color = NA_data$TSH_reading_NA)) +
   geom_point() +
+  geom_hline(yintercept = log(5), linetype = "dashed", color = "red") +
+  geom_hline(yintercept = log(0.5), linetype = "dashed", color = "blue") +
+  facet_grid(. ~ ThyroidClass) +
+  labs(x = "Age", y = "log(TSH)", color = "NA", title = "Taux de TSH dans les populations saines et malades")
+```
+
+<div style="text-indent: 20px;"> Que ce soit parmi les patients malades ou sains, le taux de TSH évolue beaucoup, y compris hors des bornes habituelles. Certaines valeurs de TSH pour des patients sains sont particulièrement élevées. Sans savoir si ces données sont correctes ou non, il est compliqué de faire confiance au calcul de la variance et de la moyenne pour les deux groupes : les données très élevées chez des gens sains impactent significativement les résultats.
+
+Comparons les niveaux de TSH et de T4. 
+En ce qui concerne les taux de T4, un taux normal se situe environ entre 50 et 150 nmol/L (ici encore les données semblent avoir cette unité). Les lignes horizontales et verticales correspondent respectivement aux taux normaux de T4 et de TSH.
+
+
+```{r, fig.width = 12, echo = FALSE, fig.align='center', warning=FALSE, message = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill), color = is.na(NA_data$T4_reading & NA_data$TSH_reading))) +
+  geom_point() +
+  geom_hline(yintercept = log(50), linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = log(150), linetype = "dashed", color = "blue") +
+  geom_vline(xintercept = log(0.35), linetype = "dashed", color = "red") +
+  geom_vline(xintercept = log(5), linetype = "dashed", color = "red") +
+  facet_grid(. ~ ThyroidClass) +
+  labs(x = "log(TSH)", y = "log(T4)", color = "Imputed value0", title = "Taux de T4 en fonction de celui de TSH, pour les populations saines et malades")
+```
+
+<div style="text-indent: 20px;"> L'essentiel des données, dans les deux groupes, sont comprises dans les intervalles de référence. Il semble difficile d'observer de façon franche un comportement différent entre les deux groupes.
+
+
+```{r, fig.width = 12, echo = FALSE, fig.align='center', warning=FALSE, message = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill),  color = is.na(NA_data$T4_reading & NA_data$TSH_reading))) +
+  geom_point() +
+  geom_hline(yintercept = log(50), linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = log(150), linetype = "dashed", color = "blue") +
+  geom_vline(xintercept = log(0.35), linetype = "dashed", color = "red") +
+  geom_vline(xintercept = log(5), linetype = "dashed", color = "red") +
   geom_smooth(method = "lm") +
-  facet_grid(query_hypothyroid ~ ThyroidClass)
+  facet_grid(query_hypothyroid ~ ThyroidClass) +
+  labs(x = "log(TSH)", y = "log(T4)", color = "Imputed value", title= "Taux de T4 en fonction de celui de TSH et de la recherche d'hypothyroïde")
 ```
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(query_hyperthyroid ~ ThyroidClass)
-```
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(presc_thyroxine ~ ThyroidClass)
-```
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(lithium ~ ThyroidClass)
-```
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(radioactive_iodine_therapyI131 ~ ThyroidClass)
-```
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(presc_anthyroid_meds ~ ThyroidClass)
-```
+<div style="text-indent: 20px;"> Comme on peut le voir ci-dessus, parmi les patients malades, une suspicion d'hypothyroïde correspond à un taux de TSH un peu trop élevé pour des taux de T4 normaux. Cela correspond bien à une hypothyroïde. (voir [Lien](https://www.uclahealth.org/medical-services/surgery/endocrine-surgery/conditions-treated/thyroid/normal-thyroid-hormone-levels)). En revanche, un grand nombre de patient déclarés sains et dont les taux d'hormones varient ont également une supicion d'hypothyroïde.La variable **query_hypothyroid** ne semble pas totalement adaptée à détecter une maladie. 
 
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = (patient_age), y = (T4_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(. ~ ThyroidClass)
-```
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = patient_age, y = (TSH_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(. ~ ThyroidClass)
-```
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T3_reading_fill), color = ThyroidClass)) +
-  geom_point() +
-  geom_smooth(method = "lm")
-```
+<div style="text-indent: 20px;"> Les autres facteurs (traitement au lithium, iodine radioactive, anti-thyroïdes, thyroxine) ne semblent pas permettre de détecter la maladie (trop peu de données pour mettre en évidence des comportements).
 
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T3_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(query_hypothyroid ~ ThyroidClass)
-```
 
-```{r, fig.width = 12, echo = FALSE}
+```{r, fig.width = 12, echo = FALSE, fig.align='center', warning=FALSE, message = FALSE}
 thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  ggplot(aes(x = (patient_age), y = (T4_reading_fill), color = NA_data$T4_reading_NA)) +
   geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(query_hyperthyroid ~ ThyroidClass)
+  geom_hline(yintercept = (50), linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = (150), linetype = "dashed", color = "red") +
+  facet_grid(. ~ ThyroidClass) +
+  labs(x = "Age", y = "Taux de T4", color = "NA", title = "Taux de T4 dans les populations saines et malades")
 ```
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(presc_thyroxine ~ ThyroidClass)
-```
+Les niveaux de T4 seuls ne mettent pas en évidence une différence de comportement marquée entre les 2 groupes.
 
-```{r, fig.width = 12, echo = FALSE}
+Qu'en est-il de l'hormone T3 ? Les niveaux de T3 sont généralement compris entre 0.8 et 2.5 nmol/L.
+
+```{r, fig.width = 12, echo = FALSE, fig.align='center', warning=FALSE, message = FALSE}
 thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  ggplot(aes(x = patient_age, y = (T3_reading_fill), color = NA_data$T3_reading_NA)) +
   geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(presc_anthyroid_meds ~ ThyroidClass)
+  geom_hline(yintercept = 0.8, linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = 2.5, linetype = "dashed", color = "red") +
+  facet_grid(. ~ ThyroidClass) +
+  labs(x = "Age", y = "Taux de T3", color = "NA", title = "Taux de T3 dans les populations saines et malades")
 ```
 
 
-```{r, fig.width = 12, echo = FALSE}
+C'est ici plus probant : chez les personnes malades, les niveaux de T3 sont bien plus bas, comme confirmé par le boxplot ci-dessous :
+
+
+
+```{r, fig.width = 12, echo = FALSE, fig.align='center', warning=FALSE, message = FALSE}
 thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(lithium ~ ThyroidClass)
+  ggplot(aes(x = ThyroidClass, y = T3_reading_fill)) +
+  geom_boxplot() +
+  labs(x = "Thyroïde", y = "T3", title = "Boxplot du taux de T3 dans les populations saines et malades")
 ```
 
-```{r, fig.width = 12, echo = FALSE}
+<div style="text-indent: 20px;"> Visuellement, l'étude du FTI et du taux d'utilisation de T4 n'apporte pas beaucoup d'information. Néanmoins, si on regarde le boxplot du taux d'utilisation de T4 ci-dessous, celui-ci semble en moyenne plus bas chez les patients malades que chez les patients sains. Cela pourrait s'expliquer par un manque d'hormones T4 initial.
+
+```{r, fig.width = 12, echo = FALSE, fig.align='center', warning=FALSE, message = FALSE}
 thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid(radioactive_iodine_therapyI131 ~ ThyroidClass)
+  ggplot(aes(x = ThyroidClass, y = T4U_rate_reading_fill)) +
+  geom_boxplot() +
+  labs(x = "Thyroïde", y = "Taux d'utilisation de T4", title = "Boxplot du taux d'utilisation de T4 dans les populations saines et malades")
 ```
 
+# <u> V. Conclusion </u>
 
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(T3_reading_fill), y = log(T4_reading_fill), color = ThyroidClass)) +
-  geom_point() +
-  geom_smooth(method = "lm")
-```
-
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = FTI_reading_fill, y = T4_reading_fill, color = ThyroidClass)) +
-  geom_point() +
-  geom_smooth(method = "lm")
-```
-
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(FTI_reading_fill), color = ThyroidClass)) +
-  geom_point() +
-  geom_smooth(method = "lm") 
-```
-
-
-```{r, fig.width = 12, echo = FALSE}
-thyroid %>% 
-  ggplot(aes(x = log(TSH_reading_fill), y = log(T4U_rate_reading_fill))) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  facet_grid( ~ ThyroidClass)
-```
+<div style="text-indent: 20px;"> En conclusion, le jeu de donnée ne semble pas simple à exploiter. Néanmoins, les variables qui varient le plus significativement entre les patients sains et malades semble être l'existence de symptômes et le taux d'hormone T3. Cela semble logique : pour diagnostiquer une maladie de la thyroïde, on observe dans un premier temps les symptômes, puis on prescrit un bilan sanguin.
