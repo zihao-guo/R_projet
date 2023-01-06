@@ -154,17 +154,185 @@ prop1 %>%
 ```
 Comme on peut le voir ci-dessus, la proportion de gens présentant une maladie est plus importante dans la population diagnostiquée malade de la thyroïde.
 
-Observons 
+Observons à présent la proportion d'autres caractéristiques telles que la chirurgie, le goitre, ou encore une tumeur.
+
+```{r, include = FALSE}
+prop2 <- thyroid %>% 
+  group_by(ThyroidClass) %>% 
+  summarize(n_goitre = sum(goitre), n_tumor = sum(tumor), n_surg = sum(thyroid_surgery), n_psy = sum(psych_condition)) %>% 
+  mutate(population = pop) %>% 
+  mutate(prop_goitre = n_goitre/population, prop_tumor = n_tumor/population, prop_surg = n_surg/population, prop_psy = n_psy/population)
+```
+
+```{r, echo = FALSE}
+plot.goitre <- prop2 %>% 
+  ggplot(aes(x = ThyroidClass, y = prop_goitre)) +
+  geom_col()
+
+plot.tumor <- prop2 %>% 
+  ggplot(aes(x = ThyroidClass, y = prop_tumor)) +
+  geom_col()
+
+plot.surg <- prop2 %>% 
+  ggplot(aes(x = ThyroidClass, y = prop_surg)) +
+  geom_col()
+
+plot.psy <- prop2 %>% 
+  ggplot(aes(x = ThyroidClass, y = prop_psy)) +
+  geom_col()
+
+gridExtra::grid.arrange(plot.goitre, plot.tumor, plot.surg, plot.psy, nrow = 2)
+```
+
+Même si de nombreuses personnes atteintes d'hyperthyroïde ont tendance à développer un goitre, le goitre peut aussi apparaître en cas de carences alimentaires, par exemple. De même, comme le montre les graphes ci-dessus, les patients malades n'ont pas plus de tumeur, de chirurgue, ou de condition psychologique que les patients non malades.
+Aucunes de ces quatre variables (goitre, thyroid_surgery, tumor, psy_condition) ne semble donc être un indicateur adapté d'une maladie de la thyroïde.
+Cela correspond aux informations fournies par la matrice de corrélation présentée plus haut. Il n'y avait aucune corrélation (linéaire) significative entre la variable ThyroidClass et les variables goitre, tumor, thyroid_surgery et psy_condition.
+
+Intéressons-nous à présent aux hormones. En cas de suspicion d'hyperthyroïde ou d'hypothyroïde, les médecins réalisent généralement un bilan sanguin, et examinent les taux de TSH, de T3 et de T4, afin de détecter de potentielles anomalies.
 
 
+Commençons par l'hormone T4.
+Les nuages de point initiaux étant difficilement exploitables, on travaillera avec les logarithmes des données.
 
-```{r, fig.width = 12}
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(query_hypothyroid ~ ThyroidClass)
+```
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(query_hyperthyroid ~ ThyroidClass)
+```
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(presc_thyroxine ~ ThyroidClass)
+```
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(lithium ~ ThyroidClass)
+```
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(radioactive_iodine_therapyI131 ~ ThyroidClass)
+```
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(presc_anthyroid_meds ~ ThyroidClass)
+```
+
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = (patient_age), y = (T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(. ~ ThyroidClass)
+```
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = patient_age, y = (TSH_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(. ~ ThyroidClass)
+```
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T3_reading_fill), color = ThyroidClass)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+```{r, fig.width = 12, echo = FALSE}
 thyroid %>% 
   ggplot(aes(x = log(TSH_reading_fill), y = log(T3_reading_fill))) +
   geom_point() +
-  facet_grid(. ~ ThyroidClass)
+  geom_smooth(method = "lm") +
+  facet_grid(query_hypothyroid ~ ThyroidClass)
+```
+
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(query_hyperthyroid ~ ThyroidClass)
+```
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(presc_thyroxine ~ ThyroidClass)
+```
+
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(presc_anthyroid_meds ~ ThyroidClass)
 ```
 
 
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(lithium ~ ThyroidClass)
+```
+
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(radioactive_iodine_therapyI131 ~ ThyroidClass)
+```
 
 
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(T3_reading_fill), y = log(T4_reading_fill), color = ThyroidClass)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = FTI_reading_fill, y = T4_reading_fill, color = ThyroidClass)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(FTI_reading_fill), color = ThyroidClass)) +
+  geom_point() +
+  geom_smooth(method = "lm") 
+```
+
+
+```{r, fig.width = 12, echo = FALSE}
+thyroid %>% 
+  ggplot(aes(x = log(TSH_reading_fill), y = log(T4U_rate_reading_fill))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid( ~ ThyroidClass)
+```
