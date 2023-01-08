@@ -1,7 +1,0 @@
-"0","# Groupe d'âge"
-"0","thyroid_impute <- mutate(thyroid_impute, patient_age_Seg = patient_age)"
-"0","thyroid_impute$patient_age_Seg <- as.numeric(factor(thyroid_impute$patient_age_Seg))"
-"0",""
-"0","thyroid_impute$patient_age_Seg<-cut(thyroid_impute$patient_age_Seg,breaks = c(-Inf, 10, 20, 30, 40 ,50 ,60, 70, 80, 90, Inf),labels = c('1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','91-100'))"
-"0",""
-"0","thyroid_impute"

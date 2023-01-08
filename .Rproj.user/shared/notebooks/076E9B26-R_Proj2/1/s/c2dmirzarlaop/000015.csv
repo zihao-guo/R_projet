@@ -1,2 +1,0 @@
-"0","thyroid_impute <- impute_lm(thyroid_impute, patient_age ~ ThryroidClass + presc_thyroxine + presc_anthyroid_meds + sick + thyroid_surgery + radioactive_iodine_therapyI131 + lithium + goitre + tumor + hypopituitarism + psych_condition + TSH_reading + T3_reading + T4_reading + thyrox_util_rate_T4U_reading + FTI_reading)"
-"0","head(thyroid_impute)"

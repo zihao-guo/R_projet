@@ -1,2 +1,0 @@
-"0","thyroid_impute <- impute_lm(thyroid_impute, T4U_rate_reading_fill ~ T3_reading_fill + T4_reading_fill + patient_age + pregnant)"
-"0","thyroid_impute"

@@ -1,3 +1,0 @@
-"0","ggplot(data=data_age_pre,"
-"0","       mapping=aes(x=patient_age_Seg,y=count))+"
-"0","  geom_point(aes(size=count, colour=presc_thyroxine),alpha=1/3 )"

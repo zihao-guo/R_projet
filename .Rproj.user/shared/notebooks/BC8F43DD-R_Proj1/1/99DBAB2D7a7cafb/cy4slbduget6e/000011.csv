@@ -1,3 +1,0 @@
-"0","thyroid_td %>% "
-"0","  ggplot(mapping = aes(x = patient_age, y = TSH_reading)) +"
-"0","  geom_miss_point()"

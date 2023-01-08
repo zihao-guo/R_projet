@@ -1,7 +1,0 @@
-"0","impute <- function(x, x.impute){ifelse(is.na(x),x.impute,x)}"
-"0","data1$TSH_reading<-impute(data1$TSH_reading, mean(is.na(data1$TSH_reading)) )"
-"0","data1$T3_reading<-impute(data1$T3_reading, mean(is.na(data1$T3_reading)) )"
-"0","data1$T4_reading<-impute(data1$T4_reading, mean(is.na(data1$T4_reading)) )"
-"0","data1$FTI_reading<-impute(data1$FTI_reading,mean(is.na(data1$FTI_reading))) "
-"0","data1$ref_src<-impute(data1$ref_src, mean(is.na(data1$ref_src)) )"
-"0","data1<-na.omit(data1) "

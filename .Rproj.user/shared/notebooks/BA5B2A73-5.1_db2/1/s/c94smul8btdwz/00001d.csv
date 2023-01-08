@@ -1,7 +1,0 @@
-"0","# c(colnames(data1)[2:24],colnames(data1)[30]),"
-"0","                # selected=colnames(data1)[[5]])"
-"0",""
-"0","selectInput(""variable"",  # 传入变量名称"
-"0","            ""Positive or not (Gender: F/ M)"", # 提示文字"
-"0","            list(""Positive"" = ""1"","
-"0","                 ""Negative"" = ""0""))"

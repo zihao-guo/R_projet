@@ -1,2 +1,0 @@
-"0","thyroid_td %>% "
-"0","  filter(is.na(thyrox_util_rate_T4U_reading) & (thyrox_util_rate_T4U_measured != 0))"

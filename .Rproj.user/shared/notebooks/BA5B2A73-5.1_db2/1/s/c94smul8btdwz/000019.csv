@@ -1,8 +1,0 @@
-"0",""
-"0","selectInput('ycol', 'Y Variable',             "
-"0","            list("
-"0","              ""The result of the Free Thyroxine Index"" = ""FTI_reading_fill"", "
-"0","              ""The reading result of the Free thyroxine"" = ""T4_reading_fill"",  "
-"0","              ""The reading result of the Free triiodothyronine"" = ""T3_reading_fill"",       "
-"0","              ""The reading result of the TSH blood test"" = ""TSH_reading_fill"",     "
-"0","              ""The result of the thyroxine utilisation rate"" = ""T4U_rate_reading_fill""))"

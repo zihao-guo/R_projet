@@ -1,6 +1,0 @@
-"0","df_14 <- data_sick %>% "
-"0","  group_by(ThyroidClass, patient_age_Seg, hypopituitarism) %>% #1"
-"0","  summarise(count = n(), "
-"0","            .groups = ""drop_last"") %>% "
-"0","  mutate(indicateur = ""hypopituitarism"") %>% #2"
-"0","  rename(positive = hypopituitarism) #3"

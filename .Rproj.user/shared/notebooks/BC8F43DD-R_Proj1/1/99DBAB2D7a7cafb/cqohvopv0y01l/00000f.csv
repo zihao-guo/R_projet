@@ -1,5 +1,0 @@
-"0","thyroid_td <- mutate(thyroid_td, T3_reading_fill = T3_reading)"
-"0","thyroid_td <- mutate(thyroid_td, T4_reading_fill = T4_reading)"
-"0","thyroid_td <- mutate(thyroid_td, TSH_reading_fill = TSH_reading) "
-"0","thyroid_td <- mutate(thyroid_td, FTI_reading_fill = FTI_reading)"
-"0","thyroid_td <- mutate(thyroid_td, T4U_rate_reading_fill = thyrox_util_rate_T4U_reading)"

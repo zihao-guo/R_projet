@@ -1,2 +1,0 @@
-"0","thyroid_impute[2] <- round(thyroid_impute[2], 0)"
-"0","head(thyroid_impute)"

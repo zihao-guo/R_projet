@@ -1,2 +1,0 @@
-"0","# Sauvegarder les données nettoyées"
-"0","thyroid_tidy %>% write.csv(file = ""../A_Datas/thyroid_tidy.csv"")"

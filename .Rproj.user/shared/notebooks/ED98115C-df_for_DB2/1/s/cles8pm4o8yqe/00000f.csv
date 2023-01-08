@@ -1,6 +1,0 @@
-"0","df_8 <- data_sick %>% "
-"0","  group_by(ThyroidClass, patient_age_Seg, radioactive_iodine_therapyI131) %>% #1"
-"0","  summarise(count = n(), "
-"0","            .groups = ""drop_last"") %>% "
-"0","  mutate(indicateur = ""radioactive_iodine_therapyI131"") %>% #2"
-"0","  rename(positive = radioactive_iodine_therapyI131) #3"

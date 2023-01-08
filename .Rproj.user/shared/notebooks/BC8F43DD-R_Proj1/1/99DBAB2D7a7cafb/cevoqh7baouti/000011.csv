@@ -1,2 +1,0 @@
-"0","thyroid_td %>% "
-"0","  filter(T3_measured != 1 & T3_measured != 0)"

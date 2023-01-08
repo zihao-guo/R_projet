@@ -1,4 +1,0 @@
-"0","data1$ThryroidClass <- as.numeric(factor(data1$ThryroidClass))"
-"0","data1$patient_age <- as.numeric(factor(data1$patient_age))"
-"0","data1$ref_src <- as.numeric(factor(data1$ref_src))"
-"0","data1$FTI_reading <- as.numeric(factor(data1$FTI_reading))"

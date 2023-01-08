@@ -1,6 +1,0 @@
-"0","thyroid_td <- thyroid_raw %>% "
-"0","  remove_empty(c(""rows"", ""cols"")) %>%"
-"0","  remove_constant(na.rm = FALSE, quiet = FALSE)"
-"2","No constant columns to remove.
-"
-"0","thyroid_td"

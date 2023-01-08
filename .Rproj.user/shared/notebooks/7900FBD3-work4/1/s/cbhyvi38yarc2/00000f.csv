@@ -1,4 +1,0 @@
-"0","library(broom)"
-"0",""
-"0","model%>% tidy %>% write.csv(file = ""mtcars.lm.tidy.csv"")"
-"0","model%>% glance %>% write.csv(file = ""mtcars.lm.glance.csv"")"

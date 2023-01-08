@@ -1,2 +1,0 @@
-"0","model_tidy <- model%>% tidy"
-"0","model_tidy[order(-model_tidy$estimate),]"

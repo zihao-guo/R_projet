@@ -1,6 +1,0 @@
-"0","data1 %>% "
-"0","  group_by(patient_gender, presc_thyroxine, queried_why_on_thyroxine, presc_anthyroid_meds, sick, pregnant, thyroid_surgery, radioactive_iodine_therapyI131, query_hypothyroid, query_hyperthyroid, lithium, goitre, tumor, hypopituitarism, "
-"0","psych_condition, TSH_measured, T3_measured, T4_measured, thyrox_util_rate_T4U_measured, FTI_measured) %>% "
-"0","  summarise(count = n(),"
-"0","            .groups = ""drop_last"") %>% "
-"0","  head()"

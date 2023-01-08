@@ -1,2 +1,0 @@
-"0","thyroid_td %>% "
-"0","  filter(is.na(T4_reading) & T4_measured != 0)"

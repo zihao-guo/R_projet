@@ -1,1 +1,0 @@
-"0","df_sum %>% write.csv(file = ""../A_Datas/df_tidy_for_db2.csv"", row.names=F)"

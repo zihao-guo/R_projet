@@ -1,4 +1,0 @@
-"0","data1 <- read.csv(""../A_Datas/thyroid.csv"",encoding = 'UTF-8')"
-"2","Warning: cannot open file '../A_Datas/thyroid.csv': No such file or directory"
-"2","Error in file(file, ""rt"") : cannot open the connection
-"

@@ -1,4 +1,0 @@
-"0","data1 %>% "
-"0","  filter(sick == 1) %>% "
-"0","  ggplot(mapping = aes(x = FTI_reading_fill)) + "
-"0","  geom_freqpoly(mapping = aes(colour = patient_age_Seg))"
