@@ -129,7 +129,7 @@ Les données imputées semblent se distribuer de la même façon que les donnée
 
 Notre dashboard est constitué de trois pages :
 
-1. la première est un récapitulatif des informations de chaque patient. Chaque patient est identifié par un numéro qui correspond au numéro de sa ligne dans le dataset. L'utilisateur peut sélectionner dans la sidebar le numéro voulu.
+1. la première est un récapitulatif des informations de chaque patient. Chaque patient est identifié par un numéro qui correspond au numéro de sa ligne dans le dataset. L'utilisateur peut sélectionner dans la sidebar le numéro voulu. Il est à noter que les gauges changent de couleur hors des intervalles normaux, dont les valeurs ont été trouvées sur internet et comparées aux valeurs du dataset. En particulier, pour l'hormone TSH, certaines valeurs du dataset sont bien au-dessus du range normal. 
 2. la seconde contient un résumé des données du dataset.
 3. la troisième permet de visualiser les données sous forme de graphique, de radar ou de boxplot. La variable X et Y du graphique sont au choix de l'utilisateur. De même, l'utilisateur peut choisir le facteur d'influence qu'il souhaite observer dans le graphique. Ce facteur d'influence choisi est décrit par le radar chart. Les variables X et Y sont décrites par les boxplots.
 
