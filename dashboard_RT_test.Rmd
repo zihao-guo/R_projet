@@ -21,6 +21,8 @@ library(plotly)
 # 1.Importation des données
 data1 <- read.csv("A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
 data2 <- read.csv("A_Datas/df_tidy_for_db3.csv")
+data2_1 <- read.csv("A_Datas/df_tidy_for_db2_1.csv") # for db2
+data2_2 <- read.csv("A_Datas/df_tidy_for_db2_2.csv") # for db2
 data3 <- read.csv("A_Datas/df_tidy_for_db2.csv")
 thyroid <- read_csv("A_Datas/thyroid_tidy.csv")
 raw <- read_csv("A_Datas/thyroid.csv")
@@ -374,7 +376,7 @@ selectInput("variable",  # 传入变量名称
 
 
 
-Column {data-width=400}
+Column {data-height=600}
 -----------------------------------------------------------------------
 ### Comparison of different factors
 ```{r}
@@ -398,23 +400,50 @@ df_2 %>%
 
 ### Comparison of different age groups
 ```{r}
-renderPlot({
-df_2 <- data3 %>% 
-  filter(indicateur == input$var)
+plot_ly(data2_2, labels = ~type_de_traitement , values = ~proportion, type = 'pie')
+```
 
-df_2$positive[df_2$positive == 0 ]<-"NO"
-df_2$positive[df_2$positive == 1 ]<-"YES"
+Column {data-height=600}
+-----------------------------------------------------------------------
+### Comparison of different age groups
+```{r}
+p <- ggplot(data=data2_1, aes(x = Age , y = Nombre, fill = Genre)) +
+        geom_bar(stat="identity")
+ggplotly(p)
+```
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+### Comparison 
+```{r}
+data1$ThyroidClass[data1$ThyroidClass == 'sick']<- 1
+data1$ThyroidClass[data1$ThyroidClass == 'negative']<- 0
 
-df_2 %>% 
-  ggplot(aes(x = patient_age_Seg, y = count)) +
-  geom_col(aes(colour=positive , fill=positive ), position = "dodge")+
-  facet_wrap( ~ ThyroidClass,nrow=2) + labs(
-    x = "age",
-    # title = "Numerical variable comparison",
-    subtitle = " ",
-    caption = "Data source: Mr.Aymeric Stamm")
+nb_malade <- sum(data1$ThyroidClass==1)
+nb_pas_malade <- sum(data1$ThyroidClass==0)
+
+sumup <- data1 %>%
+  filter(ThyroidClass==1) %>%
+  summarize(prop_malade = sum(ThyroidClass==1)/3772*100,
+            prop_femme = sum(patient_gender)/nb_malade*100,
+            moyen_age = sum(patient_age)/nb_malade,
+            min_age = min(patient_age),
+            max_age = max(patient_age))
+renderTable({
+  sumup
 })
 
+```
+### Comparison
+```{r}
+types <- data1 %>% 
+  group_by(ThyroidClass) %>% 
+  summarize(n_goitre = sum(goitre), n_tumor = sum(tumor), n_sick = sum(sick), n_hypopituitarism = sum(hypopituitarism)) %>% 
+  mutate(population = c(nb_pas_malade,nb_malade)) %>% 
+  mutate(prop_goitre = n_goitre/population*100, prop_tumor = n_tumor/population*100, prop_sick = n_sick/population*100, prop_hypopituitarism = n_hypopituitarism/population*100)
+
+renderTable({
+  types
+})
 ```
 
 

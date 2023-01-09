@@ -1,0 +1,126 @@
+---
+title: "DAAAASh"
+output: html_document
+date: "2023-01-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(flexdashboard)
+library(shiny)
+library(readr)
+
+library(ggplot2)
+library(plotly)
+```
+
+```{r}
+data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+
+data1$ThyroidClass[data1$ThyroidClass == 'sick']<- 1
+data1$ThyroidClass[data1$ThyroidClass == 'negative']<- 0
+
+view(data1)
+
+DT::datatable(data1)
+```
+
+```{r}
+nb <- data1 %>%
+  filter(ThyroidClass==1) %>%
+  group_by(patient_gender) %>%
+  summarize('1-10' = sum(patient_age<=10),
+            '11-20' = sum(patient_age<=20) - sum(patient_age<=10),
+            '21-30' = sum(patient_age<=30) - sum(patient_age<=20),
+            '31-40' = sum(patient_age<=40) - sum(patient_age<=30),
+            '41-50' = sum(patient_age<=50) - sum(patient_age<=40),
+            '51-60' = sum(patient_age<=60) - sum(patient_age<=50),
+            '61-70' = sum(patient_age<=70) - sum(patient_age<=60),
+            '71-80' = sum(patient_age<=80) - sum(patient_age<=70),
+            '81-90' = sum(patient_age<=90) - sum(patient_age<=80),
+            '91-100' = sum(patient_age<=100) - sum(patient_age<=90))
+
+nb2 <- data.frame(Age = rep(c("1-10", "11-20", "21-30", "31-40", "41-50", "51-60", "61-70", "71-80", "81-90", "91-100"), each=2),
+                  Nombre = c(nb$`1-10`, nb$`11-20`, nb$`21-30`, nb$`31-40`, nb$`41-50`, nb$`51-60`, nb$`61-70`, nb$`71-80`, nb$`81-90`, nb$`91-100`),
+                  Genre=rep(c('Homme','Femme'),10))
+
+nb2 %>% write.csv(file = "../A_Datas/df_tidy_for_db2_1.csv", row.names=F)
+  
+ggplot(data=nb2, aes(x = Age , y = Nombre, fill = Genre)) +
+        geom_bar(stat="identity")
+
+```
+
+
+
+```{r}
+nb_malade <- sum(data1$ThyroidClass==1)
+nb_pas_malade <- sum(data1$ThyroidClass==0)
+
+sumup <- data1 %>%
+  filter(ThyroidClass==1) %>%
+  summarize(prop_malade = sum(ThyroidClass==1)/3772*100,
+            prop_femme = sum(patient_gender)/nb_malade*100,
+            moyen_age = sum(patient_age)/nb_malade,
+            min_age = min(patient_age),
+            max_age = max(patient_age))
+
+DT::datatable(sumup)%>%
+  DT::formatSignif(1:3,digits=3)
+
+```
+
+
+
+
+```{r}
+types <- data1 %>% 
+  group_by(ThyroidClass) %>% 
+  summarize(n_goitre = sum(goitre), n_tumor = sum(tumor), n_sick = sum(sick), n_hypopituitarism = sum(hypopituitarism)) %>% 
+  mutate(population = c(nb_pas_malade,nb_malade)) %>% 
+  mutate(prop_goitre = n_goitre/population*100, prop_tumor = n_tumor/population*100, prop_sick = n_sick/population*100, prop_hypopituitarism = n_hypopituitarism/population*100)
+
+DT::datatable(types)%>%
+  DT::formatSignif(7:10,digits=2)
+
+```
+
+
+
+
+```{r}
+traitements1 <- data1 %>% 
+  filter(ThyroidClass == 1)%>%
+  summarize(prop_thyroxine = sum(presc_thyroxine)/nb_malade*100)
+traitements2 <- data1 %>%
+  filter(ThyroidClass == 0) %>%
+  summarize(prop_anthyroid_meds = sum(presc_anthyroid_meds)/nb_malade*100,
+            prop_thyroid_surgery = sum(thyroid_surgery)/nb_malade*100,
+            prop_radioactive_iodine_therapyI131 = sum(radioactive_iodine_therapyI131)/nb_malade*100,
+            prop_lithium = sum(lithium)/nb_malade*100,
+            prop_autre = 20.85)
+
+
+traitements <- cbind(traitements1,traitements2)
+
+DT::datatable(traitements) %>%
+  DT::formatSignif(1:5,digits=3)
+
+df2 <- data.frame(type_de_traitement=c("thyroxine","anthyroid","chirurgie","radioactive iodine","lithium","other"), 
+                proportion=c(traitements$prop_thyroxine, traitements$prop_anthyroid_meds, traitements$prop_thyroid_surgery, traitements$prop_radioactive_iodine_therapyI131,traitements$prop_lithium, traitements$prop_autre))
+
+head(df2)
+
+df2 %>% write.csv(file = "../A_Datas/df_tidy_for_db2_2.csv", row.names=F)
+
+ggplot(df2, aes(x=" ", y=proportion, fill=type_de_traitement))+
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+  labs(title = "Répartition des traitements chez les malades")
+
+plot_ly(df2, labels = ~type_de_traitement , values = ~proportion, type = 'pie')
+```
