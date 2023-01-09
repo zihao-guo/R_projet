@@ -1,0 +1,609 @@
+---
+title: "Dashboard for thyroid"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    theme: lumen
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(skimr)
+library(readr)
+
+library(ggplot2)
+library(plotly)
+```
+
+```{r}
+# 1.Importation des données
+data1 <- read.csv("A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+data2 <- read.csv("A_Datas/df_tidy_for_db3.csv")
+data3 <- read.csv("A_Datas/df_tidy_for_db2.csv")
+thyroid <- read_csv("A_Datas/thyroid_tidy.csv")
+raw <- read_csv("A_Datas/thyroid.csv")
+raw <- rename(raw, c("T3_reading_fill" = "T3_reading", "T4_reading_fill" = "T4_reading", "TSH_reading_fill" = "TSH_reading", "FTI_reading_fill" = "FTI_reading",  "T4U_rate_reading_fill" = "thyrox_util_rate_T4U_reading"))
+```
+
+
+
+
+Ⅰ.Recap
+=======================================================================
+
+
+Column {.sidebar}
+-----------------------------------------------------------
+
+Please enter the patient's number
+
+```{r}
+numericInput(inputId = 'Patient_number', label = "Patient's number", value = 1, min = 1, max = nrow(thyroid), step = 1)
+```
+
+
+Row
+-----------------------------------------------------------
+
+
+### Patient's gender
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = if (thyroid[input$Patient_number,]$patient_gender == 1) "Woman" else "Man",
+    caption = "Gender", 
+    icon = "fa-venus-mars",
+    color = if (thyroid[input$Patient_number,]$patient_gender == 0) "MediumTurquoise" else "PeachPuff"
+)})
+
+renderValueBox({
+    valueBox(
+      value = if (thyroid[input$Patient_number, ]$pregnant == 1) { "Pregnant" },
+      color = if (thyroid[input$Patient_number,]$patient_gender == 0) "MediumTurquoise" else "PeachPuff"
+    )
+  })
+
+```
+
+### Patient's age {.value-box}
+
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = thyroid[input$Patient_number,]$patient_age,
+    caption = "Age",
+    icon = "fa-user",
+    color = if (thyroid[input$Patient_number,]$patient_gender == 0) "MediumTurquoise" else "PeachPuff"
+)})
+```
+
+### Thyroïd state {.value-box}
+
+```{r}
+renderValueBox({
+  valueBox(
+    value = if (thyroid[input$Patient_number,]$ThyroidClass == "negative") "Healthy" else "Sick",
+    icon = "fa-notes-medical",
+    color = if (thyroid[input$Patient_number, ]$ThyroidClass == "sick") "DarkRed" else if (thyroid[input$Patient_number,]$patient_gender == 0) "MediumTurquoise" else "PeachPuff"
+)})
+```
+
+
+### Patient's referral source
+
+```{r}
+renderValueBox({
+    valueBox(
+      value = thyroid[input$Patient_number, ]$ref_src,
+      icon = 'fa-asterisk',
+      color = if (thyroid[input$Patient_number,]$patient_gender == 0) "MediumTurquoise" else "PeachPuff"
+    )
+  })
+```
+
+
+
+
+Row
+-----------------------------------------------------------
+
+
+
+### T4 rate
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$T4_reading_fill,
+    min = 0,
+    max = max(thyroid$T4_reading_fill),
+    sectors = gaugeSectors(success = c(80, 140), 
+                         warning = c(0, 80), 
+                         danger = c(140, max(thyroid$T4_reading_fill)),
+                         colors = c("PaleGreen", "Crimson", "Crimson")),
+    symbol = 'U',
+    label = if (thyroid[input$Patient_number, ]$T4_measured == 1) "Real Value" else "Imputed value"
+)})
+```
+
+### T3 rate
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$T3_reading_fill,
+    min = 0,
+    max = max(thyroid$T3_reading_fill),
+    sectors = gaugeSectors(success = c(0.6, 2.2), 
+                         warning = c(0, 0.6), 
+                         danger = c(2.2, max(thyroid$T3_reading_fill)),
+                         colors = c("PaleGreen", "Crimson", "Crimson")),
+    symbol = 'U',
+    label = if (thyroid[input$Patient_number, ]$T3_measured == 1) "Real Value" else "Imputed value"
+)})
+```
+
+### TSH rate
+
+ 
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$TSH_reading_fill,
+    min = 0,
+    max = max(thyroid$TSH_reading_fill),
+    sectors = gaugeSectors(success = c(0.4, 4), 
+                         warning = c(0, 0.4), 
+                         danger = c(4, max(thyroid$TSH_reading_fill)),
+                         colors = c("PaleGreen", "Crimson", "Crimson")),
+    symbol = 'U',
+    label = if (thyroid[input$Patient_number, ]$TSH_measured == 1) "Real Value" else "Imputed value"
+)})
+```
+
+
+### FTI rate
+
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$FTI_reading_fill,
+    min = 0,
+    max = max(thyroid$FTI_reading_fill),
+    sectors = gaugeSectors(success = c(60, 120), 
+                         warning = c(0, 60), 
+                         danger = c(120, max(thyroid$FTI_reading_fill)),
+                         colors = c("PaleGreen", "Crimson", "Crimson")),
+    symbol = 'U',
+    label = if (thyroid[input$Patient_number, ]$FTI_measured == 1) "Real Value" else "Imputed value"
+)})
+```
+
+### T4U rate
+
+```{r}
+renderGauge({
+  gauge(
+    value = thyroid[input$Patient_number,]$T4U_rate_reading_fill,
+    min = 0,
+    max = max(thyroid$T4U_rate_reading_fill),
+    sectors = gaugeSectors(success = c(0.7, 0.9), 
+                         warning = c(0, 0.7), 
+                         danger = c(0.9, max(thyroid$T4U_rate_reading_fill)),
+                         colors = c("PaleGreen", "Crimson", "Crimson")),
+    symbol = 'U',
+    label = if (thyroid[input$Patient_number, ]$thyrox_util_rate_T4U_measured == 1) "Real Value" else "Imputed value"
+)})
+```
+
+
+Row 
+-----------------------------------------------------------
+
+### Treatments & Operations
+
+
+```{r}
+DT::renderDataTable({
+  treat_vect <- c()
+  if (thyroid[input$Patient_number, ]$presc_thyroxine == 1) {
+    treat_vect <- append(treat_vect, "Thyroxine presciption")
+  }
+  if (thyroid[input$Patient_number, ]$presc_anthyroid_meds == 1) { 
+    treat_vect <- append(treat_vect, "Anti-thyroid medicine presciption")
+  }
+  if (thyroid[input$Patient_number, ]$radioactive_iodine_therapyI131 == 1) { 
+    treat_vect <- append(treat_vect, "Radioactive iodine treatment")
+  }
+  if (thyroid[input$Patient_number, ]$lithium == 1) { 
+    treat_vect <- append(treat_vect, "Lithium treatment")
+  }
+  if (thyroid[input$Patient_number, ]$thyroid_surgery == 1) {
+    treat_vect <- append(treat_vect, "Thyroid surgery")
+  }
+  if (length(treat_vect) == 0) {
+    treat_vect <- append(treat_vect, "No treatments or operations")
+  }
+  data <- data.frame("Treatments" = treat_vect)
+  DT::datatable(data, options = list(
+    bPaginate = FALSE
+  ))
+})
+```
+
+
+
+
+
+
+### Queries
+
+
+```{r}
+DT::renderDataTable({
+  query_vect <- c()
+  if (thyroid[input$Patient_number, ]$queried_why_on_thyroxine == 1) {
+    query_vect <- append(query_vect, "Query on why is the patient on thyroxine prescription")
+  }
+  if (thyroid[input$Patient_number, ]$query_hypothyroid == 1) { 
+    query_vect <- append(query_vect, "Under active thyroid query")
+  }
+  if (thyroid[input$Patient_number, ]$query_hyperthyroid == 1) { 
+    query_vect <- append(query_vect, "Over active thyroid query")
+  }
+  if (length(query_vect) == 0) {
+    query_vect <- append(query_vect, "No ongoing queries")
+  }
+  data <- data.frame("Queries" = query_vect)
+  DT::datatable(data, options = list(
+    bPaginate = FALSE
+  ))
+})
+```
+
+
+
+
+### Symptoms & Diagnosis
+
+
+```{r}
+DT::renderDataTable({
+  diag_vect <- c()
+  if (thyroid[input$Patient_number, ]$goitre == 1) {
+    diag_vect <- append(diag_vect, "Goitre")
+  }
+  if (thyroid[input$Patient_number, ]$tumor == 1) { 
+    diag_vect <- append(diag_vect, "Tumor")
+  }
+  if (thyroid[input$Patient_number, ]$hypopituitarism == 1) { 
+    diag_vect <- append(diag_vect, "Under active thyroid")
+  }
+  if (thyroid[input$Patient_number, ]$sick == 1) {
+    diag_vect <-append(diag_vect, "Sickness due to thyroxine depletion or over activity")
+  }
+  if (thyroid[input$Patient_number, ]$psych_condition == 1) {
+    diag_vect <-append(diag_vect, "Psychological condition")
+  }
+  if (length(diag_vect) == 0) {
+    diag_vect <- append(diag_vect, "No symptoms or diagnosis")
+  }
+  data <- data.frame("Symptômes et diagnostics" = diag_vect)
+  DT::datatable(data, options = list(
+    bPaginate = FALSE
+  ))
+})
+```
+
+
+
+
+
+
+
+
+
+
+Ⅱ.Summaries {data-orientation=Columns}
+=======================================================================
+
+Column {.sidebar}
+------------------------------------------------------------------------
+
+```{r}
+p("=============================")
+
+type <- c("patient_gender", "presc_thyroxine", "queried_why_on_thyroxine", 
+          #"presc_anthyroid_meds", 
+          "sick", 
+          #"pregnant", "thyroid_surgery", 
+          "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", 
+          # "T4_measured", 
+          "thyrox_util_rate_T4U_measured", "FTI_measured")
+
+selectInput('xcol', 'X Variable', 
+            list(
+              "The reading result of the Free triiodothyronine" = "T3_reading_fill",       
+              "The reading result of the Free thyroxine" = "T4_reading_fill",     
+              "The reading result of the TSH blood test" = "TSH_reading_fill",     
+              "The result of the Free Thyroxine Index" = "FTI_reading_fill",    
+              "The result of the thyroxine utilisation rate" = "T4U_rate_reading_fill"))
+
+selectInput('ycol', 'Y Variable',             
+            list(
+              "The reading result of the Free thyroxine" = "T4_reading_fill",  
+              "The reading result of the Free triiodothyronine" = "T3_reading_fill",       
+              "The reading result of the TSH blood test" = "TSH_reading_fill",     
+              "The result of the Free Thyroxine Index" = "FTI_reading_fill",    
+              "The result of the thyroxine utilisation rate" = "T4U_rate_reading_fill"))
+
+selectInput('var', 'Influencing Factors',
+            list("whether thyroxine replacement prescribed" = "presc_thyroxine",
+                 "Patient Gender" = "patient_gender",
+                 "query has been actioned" = "queried_why_on_thyroxine", 
+                 "sickness due to thyroxine depletion or over activity" = "sick",
+                 "whether anti-thyroid medicine has been prescribed" = "presc_anthyroid_meds",
+                 "whether the patient has had thyroid surgery" = "thyroid_surgery",
+                 "Pregnant or not"  = "pregnant",
+                 "whether patient has had radioactive iodine treatment" = "radioactive_iodine_therapyI131", 
+                 "under active thyroid query" = "query_hypothyroid", 
+                 "over active thyroid query" = "query_hyperthyroid", 
+                 "Lithium carbonate administered to decrease the level of thyroid hormones" = "lithium", 
+                 "swelling of the thyroid gland" = "goitre", 
+                 "Have a tumor" = "tumor", 
+                 "a diagnosed under active thyroid" = "hypopituitarism", 
+                 "whether a patient has a psychological condition" = "psych_condition", 
+                 "A TSH level lower than normal" = "TSH_measured", 
+                 "Is the thyroid gland hyperactive" = "T4_measured",
+                 "free triiodothyronine rise above normal" = "T3_measured", 
+                 "the thyroxine utilisation rate" = "thyrox_util_rate_T4U_measured", 
+                 "measurement on the Free Thyroxine Index" = "FTI_measured"))
+
+checkboxInput('NA', "Display real/imputed values", value = TRUE)
+
+
+selectInput("variable",  # 传入变量名称
+            "Yes or No (Gender: F/ M)", # 提示文字
+            list("Yes" = "1",
+                 "No" = "0"))
+    
+# varSelectInput("variable", "Variable:", data)
+```
+
+
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+### Comparison of different factors
+```{r}
+renderPlot({
+df_2 <- data3 %>% 
+  filter(indicateur == input$var)
+
+df_2$positive[df_2$positive == 0 ]<-"NO"
+df_2$positive[df_2$positive == 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes(x = positive, y = count)) +
+  geom_col(aes(colour=positive, fill=positive), position = "dodge")+
+  facet_grid( ~ ThyroidClass) + labs(
+    x = " ",
+    # title = "Numerical variable comparison",
+    subtitle = " ",
+    caption = "Data source: Mr.Aymeric Stamm")
+})
+```
+
+### Comparison of different age groups
+```{r}
+renderPlot({
+df_2 <- data3 %>% 
+  filter(indicateur == input$var)
+
+df_2$positive[df_2$positive == 0 ]<-"NO"
+df_2$positive[df_2$positive == 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes(x = patient_age_Seg, y = count)) +
+  geom_col(aes(colour=positive , fill=positive ), position = "dodge")+
+  facet_wrap( ~ ThyroidClass,nrow=2) + labs(
+    x = "age",
+    # title = "Numerical variable comparison",
+    subtitle = " ",
+    caption = "Data source: Mr.Aymeric Stamm")
+})
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+Ⅲ.Comparision {data-orientation=Columns}
+=======================================================================
+
+
+Column {.sidebar}
+------------------------------------------------------------------
+
+```{r}
+type <- c("patient_gender", "presc_thyroxine", "queried_why_on_thyroxine", 
+          #"presc_anthyroid_meds", 
+          "sick", 
+          #"pregnant", "thyroid_surgery", 
+          "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", 
+          # "T4_measured", 
+          "thyrox_util_rate_T4U_measured", "FTI_measured")
+
+selectInput('xcol2', 'X Variable', 
+            list(
+              "Free triiodothyronine (T3) rate" = "T3_reading_fill",       
+              "Free thyroxine (T4)" = "T4_reading_fill",     
+              "Thyroid Stimulating Hormone (TSH) rate" = "TSH_reading_fill",     
+              "Free Thyroxine Index (FTI)" = "FTI_reading_fill",    
+              "Thyroxine utilisation rate (T4U)" = "T4U_rate_reading_fill"))
+
+selectInput('ycol2', 'Y Variable',             
+            list(
+              "Free thyroxine (T4) rate" = "T4_reading_fill",  
+              "Free triiodothyronine (T3) rate" = "T3_reading_fill",       
+              "Thyroid Stimulating Hormone (TSH) rate" = "TSH_reading_fill",     
+              "Free Thyroxine Index (FTI)" = "FTI_reading_fill",    
+              "Thyroxine utilisation rate (T4U)" = "T4U_rate_reading_fill"))
+
+selectInput('var2', 'Influencing Factors',
+            list("Thyroxine replacement prescription" = "presc_thyroxine",
+                 "Patient gender" = "patient_gender",
+                 "Query on why on thyroxine" = "queried_why_on_thyroxine", 
+                 "Sickness due to thyroxine depletion or over activity" = "sick",
+                 "Anti-thyroid medicine prescription" = "presc_anthyroid_meds",
+                 "Thyroid surgery" = "thyroid_surgery",
+                 "Pregnant or not"  = "pregnant",
+                 "Radioactive iodine treatment" = "radioactive_iodine_therapyI131", 
+                 "Under active thyroid query" = "query_hypothyroid", 
+                 "Over active thyroid query" = "query_hyperthyroid", 
+                 "Lithium carbonate treatment" = "lithium", 
+                 "Goitre" = "goitre", 
+                 "Tumor" = "tumor", 
+                 "Diagnosed under active thyroid" = "hypopituitarism", 
+                 "Psychological condition" = "psych_condition", 
+                 "TSH measured" = "TSH_measured", 
+                 "T4 measured" = "T4_measured",
+                 "T3 measured" = "T3_measured", 
+                 "Thyroxine utilisation rate measured" = "thyrox_util_rate_T4U_measured", 
+                 "Free Thyroxine Index measured" = "FTI_measured"))
+
+
+checkboxInput('NAval', "Display real/imputed values", value = FALSE)
+
+
+selectInput("variable",  # 传入变量名称
+            "Display Radar Chart for presence (Yes) or absence (No) of selected incluencing factor (if gender selected : Yes = F/No = M)", # 提示文字
+            list("Yes" = "1",
+                 "No" = "0"))
+    
+# varSelectInput("variable", "Variable:", data)
+```
+
+
+
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+### Comparison of hormone values
+```{r, fig.height=10}
+renderPlot({
+df_2 <- data1 %>% 
+  rename(Factor = input$var2) %>% 
+  rename(xval = input$xcol2) %>% 
+  rename(yval = input$ycol2) %>% 
+  
+  mutate(xval = log(xval)) %>% 
+  mutate(yval = log(yval))
+
+
+df_2$Factor[df_2$Factor== 1 ]<-"With"
+df_2$Factor[df_2$Factor== 0 ]<-"Without"
+
+df_2 %>% 
+  ggplot(aes(x = xval, y = yval)) +
+  geom_point(aes(colour= if (input$NAval == TRUE) is.na(raw[input$xcol2] & raw[input$ycol2]) else Factor))+
+  facet_grid(Factor ~ ThyroidClass) + labs(
+    x = "X Variable",
+    y = "Y Variable",
+    # title = "Numerical variable comparison",
+    color = if (input$NAval == TRUE) "Real or Imputed values" else "Influencing Factor",
+    subtitle = " ",
+    caption = "Data source: Aymeric Stamm"  )
+})
+
+```
+### Comparison of indicators in different patient groups
+```{r}
+renderPlot({
+  data2 <- data2 %>% 
+    filter(p_n == input$variable, indicateur == input$var2) %>% 
+    select(-c(p_n, indicateur))
+
+AddRow=c(NA, 
+         nrow(data2)+1, 
+         data2[1,(ncol(data2)-1):ncol(data2)])
+data2 <- rbind(data2, as.numeric(AddRow))
+
+
+data2 <- data2 %>% 
+  mutate(id = c(1:6))
+data2  %>%
+  ggplot(aes(x=id)) +
+  geom_polygon(aes(y=standard),color = "black", fill= "#ffd200",alpha=0.1)+
+  geom_point(aes(y=standard, fill= "#ffd200"),size=5,shape=21,color = 'black',fill= "#ffd200")+
+  
+  geom_polygon(aes(y=mean),color = "black", fill= "#304156",alpha=0.1)+
+  geom_point(aes(y=mean, fill= "#304156"),size=5,shape=21,color = 'black', fill= "#304156")+
+  
+  geom_polygon(aes(y=median),color = "black", fill= "#f8766d",alpha=0.1)+
+  geom_point(aes(y=median, fill= "#f8766d"),size=5,shape=21,color = 'black', fill= "#f8766d")+
+  
+  coord_polar() +
+  scale_x_continuous(breaks =data2$id,labels=data2$name)+
+  theme_light()+
+  theme(axis.text.x=element_text(size = 15,colour="black"))+
+    labs(
+     x = " ", y = "Hormone values",
+    subtitle =  "Tips: Red: Mediam, Yellow: Standard, Gray: Mean" ,
+    caption = "T3: The reading result of the Free triiodothyronine | T4: The reading result of the Free thyroxine, \nTSH: The result of the TSH blood test | FTI:The result of the Free Thyroxine Index. \nT4U: The result of the thyroxine utilisation rate" )
+})
+```
+
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### Comparison of hormone values (X Variable)
+```{r}
+renderPlot({
+  df_2 <- data1 %>% 
+  rename(Factor = input$var2) %>%
+  rename(xval = input$xcol2)
+
+df_2$Factor[df_2$Factor == 1 ]<-"With"
+df_2$Factor[df_2$Factor == 0 ]<-"Without"
+
+
+df_2 %>% 
+  ggplot(aes(x=ThyroidClass, y=xval)) +
+  geom_boxplot(aes(colour=Factor))+ 
+  labs(
+    x = "Illness",
+    y = "X Variable")
+})
+```
+
+### Comparison of hormone values (Y Variable)
+```{r}
+renderPlot({
+  df_2 <- data1 %>% 
+  rename(Factor = input$var2) %>%
+  rename(yval = input$ycol2)
+
+df_2$Factor[df_2$Factor== 1 ]<-"With"
+df_2$Factor[df_2$Factor== 0 ]<-"Without"
+
+
+df_2 %>% 
+  ggplot(aes(x=ThyroidClass, y=yval)) +
+  geom_boxplot(aes(colour=Factor))+ 
+  labs(
+    x = "Illness",
+    y = "Y Variable")
+})
+```
+
