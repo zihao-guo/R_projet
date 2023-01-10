@@ -1,0 +1,150 @@
+---
+title: "Patient group comparison"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(flexdashboard)
+library(shiny)
+library(readr)
+
+library(ggplot2)
+library(plotly)
+
+data1 <- read.csv("../A_Datas/thyroid_tidy.csv",encoding = 'UTF-8')
+data2_1 <- read.csv("../A_Datas/df_tidy_for_db2_1.csv")
+data2_2 <- read.csv("../A_Datas/df_tidy_for_db2_2.csv")
+data3 <- read.csv("../A_Datas/df_tidy_for_db2.csv")
+
+```
+
+
+Sidebar {.sidebar}
+=======================================================================
+
+
+```{r}
+p("=============================")
+
+type <- c("patient_gender", "presc_thyroxine", "queried_why_on_thyroxine", 
+          #"presc_anthyroid_meds", 
+          "sick", 
+          #"pregnant", "thyroid_surgery", 
+          "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", 
+          # "T4_measured", 
+          "thyrox_util_rate_T4U_measured", "FTI_measured")
+
+
+
+selectInput('var','Influencing Factors',
+            list("whether thyroxine replacement prescribed" = "presc_thyroxine",
+                 "Patient Gender" = "patient_gender",
+                 "query has been actioned" = "queried_why_on_thyroxine", 
+                 "sickness due to thyroxine depletion or over activity" = "sick",
+                 "whether anti-thyroid medicine has been prescribed" = "presc_anthyroid_meds",
+                 "whether the patient has had thyroid surgery" = "thyroid_surgery",
+                 "Pregnant or not"  = "pregnant",
+                 "whether patient has had radioactive iodine treatment" = "radioactive_iodine_therapyI131", 
+                 "under active thyroid query" = "query_hypothyroid", 
+                 "over active thyroid query" = "query_hyperthyroid", 
+                 "Lithium carbonate administered to decrease the level of thyroid hormones" = "lithium", 
+                 "swelling of the thyroid gland" = "goitre", 
+                 "Have a tumor" = "tumor", 
+                 "a diagnosed under active thyroid" = "hypopituitarism", 
+                 "whether a patient has a psychological condition" = "psych_condition", 
+                 "A TSH level lower than normal" = "TSH_measured", 
+                 "Is the thyroid gland hyperactive" = "T4_measured",
+                 "free triiodothyronine rise above normal" = "T3_measured", 
+                 "the thyroxine utilisation rate" = "thyrox_util_rate_T4U_measured", 
+                 "measurement on the Free Thyroxine Index" = "FTI_measured"))
+
+
+    
+```
+
+Ⅱ.Summaries {data-orientation=rows}
+=======================================================================
+
+
+Column {data-height=600}
+-----------------------------------------------------------------------
+### Comparison of different factors
+```{r}
+renderPlot({
+df_2 <- data3 %>% 
+  filter(indicateur == input$var)
+
+df_2$positive[df_2$positive == 0 ]<-"NO"
+df_2$positive[df_2$positive == 1 ]<-"YES"
+
+df_2 %>% 
+  ggplot(aes(x = positive, y = count)) +
+  geom_col(aes(colour=positive, fill=positive), position = "dodge")+
+  facet_grid( ~ ThyroidClass) + labs(
+    x = " ",
+    # title = "Numerical variable comparison",
+    subtitle = " ",
+    caption = "Data source: Mr.Aymeric Stamm")
+})
+```
+
+### Repartition of the treatments
+```{r}
+plot_ly(data2_2, labels = ~type_of_traitement , values = ~proportion, type = 'pie')
+```
+
+Column {data-height=600}
+-----------------------------------------------------------------------
+### Number of sick people in the different age groups
+```{r}
+p <- ggplot(data=data2_1, aes(x = Age , y = Number, fill = Genre)) +
+        geom_bar(stat="identity")
+ggplotly(p)
+```
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+### Summary of patients informations
+```{r}
+data1$ThyroidClass[data1$ThyroidClass == 'sick']<- 1
+data1$ThyroidClass[data1$ThyroidClass == 'negative']<- 0
+
+nb_malade <- sum(data1$ThyroidClass==1)
+nb_pas_malade <- sum(data1$ThyroidClass==0)
+
+sumup <- data1 %>%
+  filter(ThyroidClass==1) %>%
+  summarize(prop_malade = sum(ThyroidClass==1)/3772*100,
+            prop_femme = sum(patient_gender)/nb_malade*100,
+            moyen_age = sum(patient_age)/nb_malade,
+            min_age = min(patient_age),
+            max_age = max(patient_age))
+
+names(sumup) <- c('negative proportion(%)', 'women proportion(%)', 'age mean', 'age min', 'age max')
+
+renderTable({
+  sumup
+})
+
+```
+### Distribution of the form of the diseases
+```{r}
+types <- data1 %>% 
+  group_by(ThyroidClass) %>% 
+  summarize(n_goitre = sum(goitre), n_tumor = sum(tumor), n_sick = sum(sick), n_hypopituitarism = sum(hypopituitarism)) %>% 
+  mutate(population = c(nb_pas_malade,nb_malade)) %>% 
+  mutate(prop_goitre = n_goitre/population*100, prop_tumor = n_tumor/population*100, prop_sick = n_sick/population*100, prop_hypopituitarism = n_hypopituitarism/population*100)
+
+types <- cbind(types[1], types[6:10])
+
+renderTable({
+  types
+})
+```
+
+

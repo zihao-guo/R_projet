@@ -315,61 +315,27 @@ Column {.sidebar}
 ------------------------------------------------------------------------
 
 ```{r}
-p("=============================")
-
-type <- c("patient_gender", "presc_thyroxine", "queried_why_on_thyroxine", 
-          #"presc_anthyroid_meds", 
-          "sick", 
-          #"pregnant", "thyroid_surgery", 
-          "radioactive_iodine_therapyI131", "query_hypothyroid", "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitarism", "psych_condition", "TSH_measured", "T3_measured", 
-          # "T4_measured", 
-          "thyrox_util_rate_T4U_measured", "FTI_measured")
-
-selectInput('xcol', 'X Variable', 
-            list(
-              "The reading result of the Free triiodothyronine" = "T3_reading_fill",       
-              "The reading result of the Free thyroxine" = "T4_reading_fill",     
-              "The reading result of the TSH blood test" = "TSH_reading_fill",     
-              "The result of the Free Thyroxine Index" = "FTI_reading_fill",    
-              "The result of the thyroxine utilisation rate" = "T4U_rate_reading_fill"))
-
-selectInput('ycol', 'Y Variable',             
-            list(
-              "The reading result of the Free thyroxine" = "T4_reading_fill",  
-              "The reading result of the Free triiodothyronine" = "T3_reading_fill",       
-              "The reading result of the TSH blood test" = "TSH_reading_fill",     
-              "The result of the Free Thyroxine Index" = "FTI_reading_fill",    
-              "The result of the thyroxine utilisation rate" = "T4U_rate_reading_fill"))
-
 selectInput('var', 'Influencing Factors',
-            list("whether thyroxine replacement prescribed" = "presc_thyroxine",
-                 "Patient Gender" = "patient_gender",
-                 "query has been actioned" = "queried_why_on_thyroxine", 
-                 "sickness due to thyroxine depletion or over activity" = "sick",
-                 "whether anti-thyroid medicine has been prescribed" = "presc_anthyroid_meds",
-                 "whether the patient has had thyroid surgery" = "thyroid_surgery",
+            list("Thyroxine replacement prescription" = "presc_thyroxine",
+                 "Patient gender" = "patient_gender",
+                 "Query on why on thyroxine" = "queried_why_on_thyroxine", 
+                 "Sickness due to thyroxine depletion or over activity" = "sick",
+                 "Anti-thyroid medicine prescription" = "presc_anthyroid_meds",
+                 "Thyroid surgery" = "thyroid_surgery",
                  "Pregnant or not"  = "pregnant",
-                 "whether patient has had radioactive iodine treatment" = "radioactive_iodine_therapyI131", 
-                 "under active thyroid query" = "query_hypothyroid", 
-                 "over active thyroid query" = "query_hyperthyroid", 
-                 "Lithium carbonate administered to decrease the level of thyroid hormones" = "lithium", 
-                 "swelling of the thyroid gland" = "goitre", 
-                 "Have a tumor" = "tumor", 
-                 "a diagnosed under active thyroid" = "hypopituitarism", 
-                 "whether a patient has a psychological condition" = "psych_condition", 
-                 "A TSH level lower than normal" = "TSH_measured", 
-                 "Is the thyroid gland hyperactive" = "T4_measured",
-                 "free triiodothyronine rise above normal" = "T3_measured", 
-                 "the thyroxine utilisation rate" = "thyrox_util_rate_T4U_measured", 
-                 "measurement on the Free Thyroxine Index" = "FTI_measured"))
-
-checkboxInput('NA', "Display real/imputed values", value = TRUE)
-
-
-selectInput("variable",  # 传入变量名称
-            "Yes or No (Gender: F/ M)", # 提示文字
-            list("Yes" = "1",
-                 "No" = "0"))
+                 "Radioactive iodine treatment" = "radioactive_iodine_therapyI131", 
+                 "Under active thyroid query" = "query_hypothyroid", 
+                 "Over active thyroid query" = "query_hyperthyroid", 
+                 "Lithium carbonate treatment" = "lithium", 
+                 "Goitre" = "goitre", 
+                 "Tumor" = "tumor", 
+                 "Diagnosed under active thyroid" = "hypopituitarism", 
+                 "Psychological condition" = "psych_condition", 
+                 "TSH measured" = "TSH_measured", 
+                 "T4 measured" = "T4_measured",
+                 "T3 measured" = "T3_measured", 
+                 "Thyroxine utilisation rate measured" = "thyrox_util_rate_T4U_measured", 
+                 "Free Thyroxine Index measured" = "FTI_measured"))
     
 # varSelectInput("variable", "Variable:", data)
 ```
@@ -398,22 +364,22 @@ df_2 %>%
 })
 ```
 
-### Comparison of different age groups
+### Repartition of the treatments
 ```{r}
-plot_ly(data2_2, labels = ~type_de_traitement , values = ~proportion, type = 'pie')
+plot_ly(data2_2, labels = ~type_of_traitement , values = ~proportion, type = 'pie')
 ```
 
 Column {data-height=600}
 -----------------------------------------------------------------------
-### Comparison of different age groups
+### Number of sick people in the different age groups
 ```{r}
-p <- ggplot(data=data2_1, aes(x = Age , y = Nombre, fill = Genre)) +
+p <- ggplot(data=data2_1, aes(x = Age , y = Number, fill = Genre)) +
         geom_bar(stat="identity")
 ggplotly(p)
 ```
 Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
-### Comparison 
+### Summary of patients informations
 ```{r}
 data1$ThyroidClass[data1$ThyroidClass == 'sick']<- 1
 data1$ThyroidClass[data1$ThyroidClass == 'negative']<- 0
@@ -428,12 +394,15 @@ sumup <- data1 %>%
             moyen_age = sum(patient_age)/nb_malade,
             min_age = min(patient_age),
             max_age = max(patient_age))
+
+names(sumup) <- c('negative proportion(%)', 'women proportion(%)', 'age mean', 'age min', 'age max')
+
 renderTable({
   sumup
 })
 
 ```
-### Comparison
+### Distribution of the form of the diseases
 ```{r}
 types <- data1 %>% 
   group_by(ThyroidClass) %>% 
@@ -441,16 +410,12 @@ types <- data1 %>%
   mutate(population = c(nb_pas_malade,nb_malade)) %>% 
   mutate(prop_goitre = n_goitre/population*100, prop_tumor = n_tumor/population*100, prop_sick = n_sick/population*100, prop_hypopituitarism = n_hypopituitarism/population*100)
 
+types <- cbind(types[1], types[6:10])
+
 renderTable({
   types
 })
 ```
-
-
-
-
-
-
 
 
 
