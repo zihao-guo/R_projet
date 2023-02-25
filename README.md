@@ -2,6 +2,10 @@
 
 Il s'agit d'une mission R de Romane, Clément, Zihao.
 
+<**Introduction**>, La thyroïde est une glande en forme de papillon, située à la base du cou, qui produit des hormones jouant un rôle important dans le métabolisme énergétique. Lorsque la thyroïde dysfonctionne, elle produit soit un excès d’hormones thyroïdiennes ; on parle alors d’hyperthyroïde, soit elle ne parvient plus à en produire suffisamment, et on parle alors d’hypothyroïde. L’objectif du projet est de créer des dashboard facilitant la visualisation d’un jeu de données sur la thyroïde, et d’en extraire des informations sur les facteurs permettant de diagnostiquer efficacement une maladie de la thyroïde.
+
+<**En conclusion**>, le jeu de donnée ne semble pas simple à exploiter. Néanmoins, les variables qui varient le plus significativement entre les patients sains et malades semble être l’existence de symptômes et le taux d’hormone T3. Cela semble logique : pour diagnostiquer une maladie de la thyroïde, on observe dans un premier temps les symptômes, puis on prescrit un bilan sanguin.
+
 ## Contenu de la branche
 - main: **Version finale**
 - dev: **Version de développement**
