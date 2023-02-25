@@ -4,9 +4,9 @@
     - [x] one for a recap of numbers of individual patients (allowing the user to choose the patient);
     - [x] one with intuitive viz or data table summaries of individual variables (possibly by subgroups);
     - [x] one for comparing groups of patients (allowing the user to choose the variable(s) by which grouping the data).
-- [ ] Separately generate a HTML report providing insight into which variables might be the best preditors of thyroid disease.
-  - [ ] Handle missing value properly:
-    - [ ] Organize Rmarkdown **[Not collated]**
+- [x] Separately generate a HTML report providing insight into which variables might be the best preditors of thyroid disease.
+  - [x] Handle missing value properly:
+    - [x] Organize Rmarkdown **[Not collated]**
       - [x] Create new variables that are copies of variables with missing values where the missing values have been imputed. Justify the method;
       - [x] In the dashboard, when a displayed number comes from your imputation process, find a way to signal it to the user.
 
